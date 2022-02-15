@@ -26,3 +26,10 @@ python manage.py runserver
 ```
 python manage.py migrate
 ```
+
+5. Test basic API
+```
+curl -X POST http://localhost:8000/api/projects/ \
+     -d '{"title": "Example title", "description": "Example description"}' \
+     -H 'Content-Type: application/json'
+```
