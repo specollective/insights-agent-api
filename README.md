@@ -19,5 +19,10 @@ pip install -r requirements.txt
 
 3. Run server
 ```
-source .env & python manage.py runserver
+python manage.py runserver
+```
+
+4. Migrate database
+```
+python manage.py migrate
 ```
