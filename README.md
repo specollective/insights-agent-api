@@ -19,5 +19,5 @@ pip install -r requirements.txt
 
 3. Run server
 ```
-python manage.py runserver
+source .env & python manage.py runserver
 ```
