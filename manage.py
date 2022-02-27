@@ -9,9 +9,9 @@ def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
-    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+    env_path = os.path.join(os.path.dirname(__file__), '.env')
     if os.path.exists(env_path):
-        dotenv.read_dotenv()
+      dotenv.read_dotenv()
 
     try:
         from django.core.management import execute_from_command_line
