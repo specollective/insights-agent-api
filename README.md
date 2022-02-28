@@ -35,14 +35,26 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
-6. Run server
+7. Create a admin user
+```
+python manage.py createsuperuser --email example@example.com --username admin
+```
+
+8. Run server
 ```
 python manage.py runserver
 ```
 
-7. Test basic API
+9. Run tests
+```
+python manage.py test
+```
+
+8. Test basic project API
 ```
 curl -X POST http://localhost:8000/api/projects/ \
      -d '{"title": "Example title", "description": "Example description"}' \
      -H 'Content-Type: application/json'
 ```
+
+9. Test Django REST API
