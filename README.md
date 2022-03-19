@@ -1,7 +1,5 @@
 # Insights Agent API
 
-# Getting the source code
-
 # Contributing
 
 Clone repository the git repository.
