@@ -1,4 +1,4 @@
-# Django Application Boilerplate
+# Insights Agent API
 
 # Getting the source code
 
