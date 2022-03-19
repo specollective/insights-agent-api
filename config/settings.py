@@ -95,7 +95,7 @@ elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
         DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.postgresql',
-                'NAME': os.environ.get('DATABASE_URL'),
+                'NAME': os.environ.get('DB_DATABASE'),
                 'USER': os.environ.get('DB_USERNAME'),
                 'PASSWORD': os.environ.get('DB_PASSWORD'),
                 'HOST': os.environ.get('DB_HOST'),
