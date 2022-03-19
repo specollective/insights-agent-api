@@ -2,10 +2,12 @@
 
 # Getting the source code
 
+# Contributing
+
 Clone repository the git repository.
 ```
-git clone git@github.com:specollective/django-application-boilerplate.git
-cd django-application-boilerplate
+git clone git@github.com:specollective/insights-agent-api.git
+cd insights-agent-api
 ```
 
 # Development Environment (localhost)
@@ -56,5 +58,3 @@ curl -X POST http://localhost:8000/api/projects/ \
      -d '{"title": "Example title", "description": "Example description"}' \
      -H 'Content-Type: application/json'
 ```
-
-9. Test Django REST API
