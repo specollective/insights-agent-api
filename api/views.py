@@ -36,6 +36,6 @@ def send_magic_link(request):
     try:
         sms_client = SmsClient()
         response = sms_client.send_sms(data['phone_number'])
-        return JsonResponse({ "message": "success" })
+        return JsonResponse({ "message": "success" }, status=200)
     except:
         return JsonResponse({ "message": "error" }, status=400)
