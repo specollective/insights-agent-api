@@ -1,11 +1,15 @@
+import os
 from unittest import mock
 from django.test import TestCase, Client
 from rest_framework import status
 from .services import SmsClient
 
 
+@mock.patch.dict(os.environ, {"TWILIO_ACCOUNT_SID": "FAKE_TWILIO_ACCOUNT_SID"})
+@mock.patch.dict(os.environ, {"TWILIO_AUTH_TOKEN": "FAKE_TWILIO_AUTH_TOKEN"})
 class SendMagicLinkTest(TestCase):
-    """ Test module for sending a magic link via SMS"""
+    """Test module for sending a magic link via SMS"""
+
 
     @mock.patch.object(SmsClient, 'send_sms')
     def test_send_magic_link_post_request_success(self, mock_send_sms):
