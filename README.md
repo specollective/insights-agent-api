@@ -72,3 +72,10 @@ curl -X POST http://localhost:8000/api/send_magic_link \
      -H 'Content-Type: application/json'
 ```
   **Note:** Right now, we are using a trial Twilio phone number for testing. Your phone number needs to be added to the verified caller list to be able to test sending messages to your phone number.
+
+13. Manually testing user creation API
+```
+curl -X POST http://localhost:8000/api/users/ \
+     -d '{"username": "EXAMPLE_USER"}' \
+     -H 'Content-Type: application/json'
+```

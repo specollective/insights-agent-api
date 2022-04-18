@@ -2,7 +2,7 @@ import os
 from unittest import mock
 from django.test import TestCase, Client
 from rest_framework import status
-from .services import SmsClient
+from api.services import SmsClient
 
 
 @mock.patch.dict(os.environ, {"TWILIO_ACCOUNT_SID": "FAKE_TWILIO_ACCOUNT_SID"})

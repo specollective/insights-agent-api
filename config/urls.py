@@ -19,14 +19,14 @@ from rest_framework import routers
 from api import views
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
-router.register(r'groups', views.GroupViewSet)
+router.register(r'study_participants', views.StudyParticipantViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('projects/', include('projects.urls')),
     path('api/send_magic_link', views.send_magic_link, name='send_magic_link'),
     path('api/', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # TODO: Determine if we need this.
+    # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('', include('pages.urls')),
 ]

@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'pages.apps.PagesConfig',
     'projects.apps.ProjectsConfig',
     'rest_framework',
+    'phonenumber_field',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -157,3 +159,5 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [],
     'TEST_REQUEST_DEFAULT_FORMAT': 'json'
 }
+
+AUTH_USER_MODEL = 'api.StudyParticipant'
