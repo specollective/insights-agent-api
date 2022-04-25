@@ -11,57 +11,8 @@ from rest_framework import status
 
 from api.models import StudyParticipant, DataEntry, Survey
 from api.services import SmsClient
+from rest_framework_simplejwt.tokens import RefreshToken
 
-
-###########################################################
-# Model Tests
-###########################################################
-
-class StudyParticipantModelTest(TestCase):
-    """
-    Test module for StudyParticipant model
-    """
-
-    def test_study_participant_attributes(self):
-        user = User.objects.create(username='example username')
-        study_participant = user.studyparticipant
-        study_participant.phone_number = '8455914054'
-        study_participant.save()
-        self.assertEqual(study_participant.phone_number, '8455914054')
-
-    def test_study_participant_phone_number_presence_validation(self):
-        user = User.objects.create(username='example username')
-        study_participant = user.studyparticipant
-
-        try:
-            study_participant.full_clean()
-        except ValidationError as e:
-            self.assertEqual(
-                e.message_dict['phone_number'][0],
-                'This field cannot be blank.',
-            )
-
-    def test_study_participant_phone_number_unique_validation(self):
-        user1 = User.objects.create(username='example username')
-        study_participant1 = user1.studyparticipant
-        study_participant1.phone_number = '8455914054'
-        study_participant1.save()
-
-        user2 = User.objects.create(username='example username 2')
-        study_participant2 = user2.studyparticipant
-        study_participant2.phone_number = '8455914054'
-
-        try:
-            study_participant2.full_clean()
-        except ValidationError as e:
-            self.assertEqual(
-                e.message_dict['phone_number'][0],
-                'User with this Phone number already exists.',
-            )
-
-###############################################################
-# API Tests
-###############################################################
 
 ###############################################################
 # Magic LInk API
@@ -96,6 +47,41 @@ class SendMagicLinkTest(TestCase):
         json = response.json()
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(json['message'], 'error')
+
+# @mock.patch.object(SmsClient, 'send_sms', side_effect=Exception('Bang!'))
+# def test_send_access_code_post_request_error(self, mock_send_sms):
+#     client = Client()
+#     response = client.post(
+#         '/api/send_access_code',
+#         '{"phone_number": "+18888888888", "name": "John Doe"}',
+#         content_type="application/json"
+#     )
+#     json = response.json()
+#     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+#     self.assertEqual(json['status'], 'error')
+#
+#
+# @mock.patch.object(SmsClient, 'send_sms', side_effect=Exception('Bang!'))
+# def test_check_access_code_post_request_success(self, mock_send_sms):
+#     otp_client = OtpClient()
+#     client = Client()
+#
+#     user = User.objects.create(username='Example Name')
+#     user.studyparticipant.phone_number = '+18888888888'
+#     user.studyparticipant.save()
+#
+#     response = client.post(
+#         '/api/check_access_code',
+#         jsonDump({
+#           "otp": otp_client.generate(),
+#           "token": str(user.studyparticipant.token)
+#         }),
+#         content_type="application/json"
+#     )
+#
+#     json = response.json()
+#     self.assertEqual(response.status_code, status.HTTP_200_OK)
+#     self.assertEqual(json['status'], 'success')
 
 ###############################################################
 # Data Entry API
@@ -132,6 +118,7 @@ class DataEntryAPI(TestCase):
 class SurveyAPI(TestCase):
     """ Test module for Survey API """
 
+    # TODO: Add assertion for HTTP only auth
     def test_data_survey_post_request(self):
         client = Client()
         example_data = {
@@ -143,10 +130,15 @@ class SurveyAPI(TestCase):
            "marital_status": "married",
         }
 
+        user = User.objects.create(username='example-user-name')
+
+        refresh = RefreshToken.for_user(user)
+
         response = client.post(
             '/api/surveys/',
             dumpJson(example_data),
-            content_type="application/json"
+            content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer {str(refresh.access_token)}"
         )
         json = response.json()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
