@@ -26,6 +26,7 @@ class SurveySerializer(serializers.HyperlinkedModelSerializer):
             'education_level',
         ]
 
+
 class DataEntrySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = DataEntry

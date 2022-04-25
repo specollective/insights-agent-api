@@ -4,14 +4,20 @@ from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework.decorators import api_view
-
 from api.services import SmsClient
-from api.serializers import UserSerializer, GroupSerializer, SurveySerializer, DataEntrySerializer
+from api.serializers import (
+    UserSerializer,
+    GroupSerializer,
+    SurveySerializer,
+    DataEntrySerializer
+)
 from api.models import Survey, DataEntry
+
 
 ###############################################################
 # REST Framework ModelViewSets
 ###############################################################
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -52,9 +58,11 @@ class DataEntryViewSet(viewsets.ModelViewSet):
     permission_classes = []
     http_method_names = ['post']
 
+
 ###############################################################
 # REST Framework Decorated Methods
 ###############################################################
+
 
 @api_view(['POST'])
 def send_magic_link(request):
@@ -66,6 +74,6 @@ def send_magic_link(request):
     try:
         sms_client = SmsClient()
         response = sms_client.send_sms(data['phone_number'])
-        return JsonResponse({ "message": "success" }, status=200)
+        return JsonResponse({"message": "success"}, status=200)
     except:
-        return JsonResponse({ "message": "error" }, status=400)
+        return JsonResponse({"message": "error"}, status=400)

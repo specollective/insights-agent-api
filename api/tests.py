@@ -29,7 +29,6 @@ class StudyParticipantModelTest(TestCase):
         study_participant.save()
         self.assertEqual(study_participant.phone_number, '8455914054')
 
-
     def test_study_participant_phone_number_presence_validation(self):
         user = User.objects.create(username='example username')
         study_participant = user.studyparticipant
@@ -41,7 +40,6 @@ class StudyParticipantModelTest(TestCase):
                 e.message_dict['phone_number'][0],
                 'This field cannot be blank.',
             )
-
 
     def test_study_participant_phone_number_unique_validation(self):
         user1 = User.objects.create(username='example username')
@@ -69,11 +67,11 @@ class StudyParticipantModelTest(TestCase):
 # Magic LInk API
 ###############################################################
 
+
 @mock.patch.dict(os.environ, {"TWILIO_ACCOUNT_SID": "FAKE_TWILIO_ACCOUNT_SID"})
 @mock.patch.dict(os.environ, {"TWILIO_AUTH_TOKEN": "FAKE_TWILIO_AUTH_TOKEN"})
 class SendMagicLinkTest(TestCase):
     """Test module for sending a magic link via SMS"""
-
 
     @mock.patch.object(SmsClient, 'send_sms')
     def test_send_magic_link_post_request_success(self, mock_send_sms):
@@ -103,6 +101,7 @@ class SendMagicLinkTest(TestCase):
 # Data Entry API
 ###############################################################
 
+
 class DataEntryAPI(TestCase):
     """ Test module for DataEntry API """
 
@@ -128,6 +127,7 @@ class DataEntryAPI(TestCase):
 ###############################################################
 # Survey API
 ###############################################################
+
 
 class SurveyAPI(TestCase):
     """ Test module for Survey API """
