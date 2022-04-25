@@ -176,13 +176,14 @@ CSRF_TRUSTED_ORIGINS = [
     'https://insights-agent-web-app.netlify.app',
 ]
 
-ALLOWED_HOSTS = [
-   'localhost',
-   '127.0.0.1',
-   '0.0.0.0',
-   'insights-agent-web-app.netlify.app',
-   'insights-agent-api.specollective.org',
-]
+ALLOWED_HOSTS = ['*']
+#    'localhost',
+#    '127.0.0.1',
+#    '0.0.0.0',
+#    '0.0.0.0:8080'
+#    'insights-agent-web-app.netlify.app',
+#    'insights-agent-api.specollective.org',
+# ]
 
 CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding',
                       'content-type', 'accept', 'origin', 'authorization')
