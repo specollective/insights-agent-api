@@ -30,7 +30,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 class SurveyViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows survey to be viewed or edited.
+    API endpoint that allows surveys to be created.
     """
     queryset = Survey.objects.all()
     serializer_class = SurveySerializer
@@ -41,7 +41,7 @@ class SurveyViewSet(viewsets.ModelViewSet):
 
 class DataEntryViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows data entry to be viewed or edited.
+    API endpoint that allows data entries to be created.
     """
     queryset = DataEntry.objects.all()
     serializer_class = DataEntrySerializer
