@@ -8,8 +8,6 @@ from api.models import Survey, DataEntry, StudyParticipant
 
 
 User = get_user_model()
-otp_client = OtpClient()
-sms_client = SmsClient()
 
 
 def get_tokens_for_user(user):
@@ -43,6 +41,7 @@ def create_study_participant(username, phone_number):
 
 
 def create_magic_link(study_participant):
+    otp_client = OtpClient()
     otp = otp_client.generate()
     token = str(study_participant.token)
     return f"http://localhost:3000/confirmation/{otp}/{token}"

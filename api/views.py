@@ -35,9 +35,6 @@ from api.utils import (
 )
 
 User = get_user_model()
-otp_client = OtpClient()
-sms_client = SmsClient()
-
 DEBUG = os.getenv("DEBUG", "False") == "True"
 DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
 
@@ -98,6 +95,7 @@ def send_magic_link(request):
     data = loadJson(request.body.decode("utf-8"))
 
     try:
+        sms_client = SmsClient()
         sms_client.send_sms(data['phone_number'])
         return Response({"message": "success"}, status=200)
     except:
@@ -129,6 +127,7 @@ def send_access_code(request):
         if DEVELOPMENT_MODE:
             print(magic_link)
         else:
+            sms_client = SmsClient()
             sms_client.send_sms_magic_link(phone_number, magic_link)
 
         return Response({
@@ -210,6 +209,7 @@ def resend_access_code(request):
         study_participant = StudyParticipant.objects.get(
           phone_number=phone_number
         )
+        otp_client = OtpClient()
         otp = otp_client.generate()
         token = str(study_participant.token)
         magic_link = f"http://localhost:3000/confirmation/{otp}/{token}"
