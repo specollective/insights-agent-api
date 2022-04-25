@@ -34,7 +34,9 @@ class SurveyViewSet(viewsets.ModelViewSet):
     """
     queryset = Survey.objects.all()
     serializer_class = SurveySerializer
+    # TODO: Apply permissions
     permission_classes = []
+    http_method_names = ['post']
 
 
 class DataEntryViewSet(viewsets.ModelViewSet):
@@ -43,7 +45,9 @@ class DataEntryViewSet(viewsets.ModelViewSet):
     """
     queryset = DataEntry.objects.all()
     serializer_class = DataEntrySerializer
+    # TODO: Apply permissions
     permission_classes = []
+    http_method_names = ['post']
 
 
 @api_view(['POST'])

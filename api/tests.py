@@ -124,3 +124,30 @@ class DataEntryAPI(TestCase):
         json = response.json()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(json['application_name'], 'example')
+
+###############################################################
+# Survey API
+###############################################################
+
+class SurveyAPI(TestCase):
+    """ Test module for Survey API """
+
+    def test_data_survey_post_request(self):
+        client = Client()
+        example_data = {
+           "age": 30,
+           "token": "example-token",
+           "education_level": "college",
+           "gender": "female",
+           "hispanic_origin": True,
+           "marital_status": "married",
+        }
+
+        response = client.post(
+            '/api/surveys/',
+            dumpJson(example_data),
+            content_type="application/json"
+        )
+        json = response.json()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(json['education_level'], 'college')
