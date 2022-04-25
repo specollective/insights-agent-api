@@ -179,6 +179,7 @@ CSRF_TRUSTED_ORIGINS = [
 ALLOWED_HOSTS = [
    'localhost',
    '127.0.0.1',
+   '0.0.0.0',
    'insights-agent-web-app.netlify.app',
    'insights-agent-api.specollective.org',
 ]
