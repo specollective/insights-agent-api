@@ -9,6 +9,9 @@ from api.services import SmsClient
 from api.serializers import UserSerializer, GroupSerializer, SurveySerializer, DataEntrySerializer
 from api.models import Survey, DataEntry
 
+###############################################################
+# REST Framework ModelViewSets
+###############################################################
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -49,6 +52,9 @@ class DataEntryViewSet(viewsets.ModelViewSet):
     permission_classes = []
     http_method_names = ['post']
 
+###############################################################
+# REST Framework Decorated Methods
+###############################################################
 
 @api_view(['POST'])
 def send_magic_link(request):
