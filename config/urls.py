@@ -17,6 +17,11 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 from api import views
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
 
 
 router = routers.DefaultRouter()
@@ -28,9 +33,19 @@ router.register(r'data_entries', views.DataEntryViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('projects/', include('projects.urls')),
-    path('api/send_magic_link', views.send_magic_link, name='send_magic_link'),
     path('api/', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('api/send_magic_link', views.send_magic_link, name='send_magic_link'),
+    path('api/send_access_code', views.send_access_code, name='send_access_code'),
+    path('api/check_access_code', views.check_access_code, name='check_access_code'),
+    path('api/resend_access_code', views.resend_access_code, name='resend_access_code'),
+    path('api/logout', views.logout, name='logout'),
+    path('api/current_user', views.current_user, name='current_user'),
     path('', include('pages.urls')),
 ]
+
+# Cruft
+# path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+# path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+# path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+# path('projects/', include('projects.urls')),
+# path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),

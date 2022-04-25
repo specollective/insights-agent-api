@@ -62,3 +62,6 @@ class DataEntry(models.Model):
     url = models.URLField(max_length=200)
     timestamp = models.DateTimeField()
     token = models.CharField(max_length=200, blank=True, unique=True)
+
+    class Meta:
+        verbose_name_plural = "Data Entries"
