@@ -161,20 +161,24 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [],
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
         'api.auth.CustomAuthentication',
+        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+    'https://insights-agent-web-app.netlify.app',
 ]
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
-
-ALLOWED_HOSTS = [
-   'localhost', '127.0.0.1'
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'https://insights-agent-web-app.netlify.app',
 ]
+
+# ALLOWED_HOSTS = [
+#    'localhost', '127.0.0.1'
+# ]
 
 CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding',
                       'content-type', 'accept', 'origin', 'authorization')

@@ -5,8 +5,8 @@ import pyotp
 
 class SmsClient(object):
     def __init__(self):
-        account_sid = os.getenv['TWILIO_ACCOUNT_SID']
-        auth_token = os.getenv['TWILIO_AUTH_TOKEN']
+        account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+        auth_token = os.getenv('TWILIO_AUTH_TOKEN')
         self.client = TwilioClient(account_sid, auth_token)
 
     def send_sms(self, phone_number):
