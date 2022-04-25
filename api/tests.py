@@ -1,5 +1,6 @@
 import os
 import uuid
+from json import dumps as dumpJson
 
 from unittest import mock
 from django.contrib.auth.models import User
@@ -8,7 +9,7 @@ from django.test import TestCase
 from django.test import TestCase, Client
 from rest_framework import status
 
-from api.models import StudyParticipant
+from api.models import StudyParticipant, DataEntry, Survey
 from api.services import SmsClient
 
 
@@ -64,6 +65,10 @@ class StudyParticipantModelTest(TestCase):
 # API Tests
 ###############################################################
 
+###############################################################
+# Magic LInk API
+###############################################################
+
 @mock.patch.dict(os.environ, {"TWILIO_ACCOUNT_SID": "FAKE_TWILIO_ACCOUNT_SID"})
 @mock.patch.dict(os.environ, {"TWILIO_AUTH_TOKEN": "FAKE_TWILIO_AUTH_TOKEN"})
 class SendMagicLinkTest(TestCase):
@@ -93,3 +98,29 @@ class SendMagicLinkTest(TestCase):
         json = response.json()
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(json['message'], 'error')
+
+###############################################################
+# Data Entry API
+###############################################################
+
+class DataEntryAPI(TestCase):
+    """ Test module for DataEntry API """
+
+    def test_data_entry_post_request(self):
+        client = Client()
+        example_data = {
+           "token": "sdfsew44",
+           "application_name": "example",
+           "tab_name": "example",
+           "url": "http://localhost:3000",
+           "timestamp": "2022-04-25 01:44:57.620506",
+        }
+
+        response = client.post(
+            '/api/data_entries/',
+            dumpJson(example_data),
+            content_type="application/json"
+        )
+        json = response.json()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(json['application_name'], 'example')

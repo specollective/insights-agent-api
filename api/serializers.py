@@ -26,13 +26,13 @@ class SurveySerializer(serializers.HyperlinkedModelSerializer):
             'education_level',
         ]
 
-class SurveySerializer(serializers.HyperlinkedModelSerializer):
+class DataEntrySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Survey
+        model = DataEntry
         fields = [
             'token',
-            'age',
-            'gender',
-            'hispanic_origin',
-            'education_level',
+            'application_name',
+            'tab_name',
+            'url',
+            'timestamp',
         ]
