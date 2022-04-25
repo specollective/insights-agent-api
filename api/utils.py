@@ -44,4 +44,5 @@ def create_magic_link(study_participant):
     otp_client = OtpClient()
     otp = otp_client.generate()
     token = str(study_participant.token)
-    return f"http://localhost:3000/confirmation/{otp}/{token}"
+    base_url = os.getenv('CLIENT_URL')
+    return f"{base_url}/confirmation/{otp}/{token}"
