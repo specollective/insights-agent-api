@@ -88,7 +88,7 @@ class AuthenticationAPITest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json['message'], 'success')
         # self.assertEqual(len(json['survey_token']), 140)
-        # self.assertEqual(len(json['refresh_token']), 229)
+        self.assertEqual(len(json['refresh_token']), 229)
 
         # Assert that we update the study participants confirmed_phone_number field.
         user.studyparticipant.refresh_from_db()

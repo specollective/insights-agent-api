@@ -150,7 +150,14 @@ def check_access_code(request):
         study_participant.confirmed_phone_number = True
         study_participant.save()
 
-        return Response({"message": "success"}, status=200)
+        refresh = RefreshToken.for_user(study_participant.user)
+        response_data = {
+          "message": "success",
+          "refresh_token": str(refresh),
+          "access_token": str(refresh.access_token),
+        }
+
+        return Response(response_data, status=200)
     else:
         return Response({"message": "invalid access code"}, status=400)
 
