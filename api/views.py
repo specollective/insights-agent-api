@@ -1,4 +1,5 @@
 import os
+import uuid
 from json import loads as loadJson
 from cryptography.fernet import Fernet
 
@@ -32,6 +33,9 @@ from api.utils import (
     is_phone_number_taken,
     create_study_participant,
     create_magic_link,
+    create_survey_token,
+    check_access_code_response_data,
+    find_study_participant_by_token,
 )
 
 User = get_user_model()
@@ -110,32 +114,22 @@ def send_access_code(request):
     """
     # 1. Parse request parameters.
     data = loadJson(request.body.decode("utf-8"))
-    username = data['name']
+    full_name = data['full_name']
     phone_number = data['phone_number']
-
-    if is_phone_number_taken(phone_number):
-        return Response({"message": "invalid credentials"}, status=400)
-
-    study_participant = create_study_participant(username, phone_number)
+    study_participant = create_study_participant(full_name, phone_number)
 
     if study_participant is None:
         return Response({"message": "invalid credentials"}, status=400)
 
-    magic_link = create_magic_link(study_participant)
+    token = str(study_participant.token)
+    magic_link = create_magic_link(token)
 
     try:
-        if DEVELOPMENT_MODE:
-            print(magic_link)
-        else:
-            sms_client = SmsClient()
-            sms_client.send_sms_magic_link(phone_number, magic_link)
-
-        return Response({
-            "status": "success",
-            "token": str(study_participant.token),
-        }, status=200)
+        sms_client = SmsClient()
+        sms_client.send_sms_magic_link(phone_number, magic_link)
+        return Response({"message": "success", "token": token}, status=200)
     except:
-        return Response({"status": "error"}, status=400)
+        return Response({"message": "sms failed to send"}, status=400)
 
 
 # POST /api/check_access_code
@@ -146,53 +140,36 @@ def check_access_code(request):
     """
     data = loadJson(request.body.decode("utf-8"))
 
-    try:
-        study_participant = StudyParticipant.objects.get(token=data['token'])
-    except StudyParticipant.DoesNotExist:
-        return Response({
-            "status": "error",
-            "message:": "invalid credentials"
-        }, status=400)
+    study_participant = find_study_participant_by_token(data['token'])
+    if study_participant is None:
+        return Response({"message": "invalid credentials"}, status=400)
 
     otp_client = OtpClient()
     if otp_client.verify(data['otp']):
-        try:
-            study_participant.confirmed_phone_number = True
-            study_participant.save()
+        study_participant.confirmed_phone_number = True
+        study_participant.save()
 
-            user = study_participant.user
-            refresh = RefreshToken.for_user(user)
-            fernet = Fernet(os.getenv('SECRET_KEY').encode('utf-8'))
-            survey_token = fernet.encrypt(
-                study_participant.token.encode('utf-8')
-            )
-            access_token = refresh.access_token
-            string_token = str(access_token)
+        survey_token = create_survey_token(study_participant.token)
+        refresh = RefreshToken.for_user(study_participant.user)
+        response_data = {
+          "message": "success",
+          "refresh_token": str(refresh),
+          "access_token": str(refresh.access_token),
+          "survey_token": str(survey_token),
+        }
+        response = Response(response_data, status=200)
+        cookie_max_age = 3600 * 24 * 14
 
-            response_data = {
-                'status': 'success',
-                'refresh': str(refresh),
-                'access': string_token,
-                'survey_token': survey_token.decode('utf-8'),
-            }
+        response.set_cookie(
+            'access_token',
+            response_data['access_token'],
+            max_age=cookie_max_age,
+            httponly=True
+        )
 
-            response = Response(response_data, status=200)
-            cookie_max_age = 3600 * 24 * 14   # 14 days
-            response.set_cookie(
-                'access_token',
-                string_token,
-                max_age=cookie_max_age,
-                httponly=True
-            )
-
-            return response
-        except:
-            return Response({
-                "status": "error",
-                "message:": "something went wrong"
-            }, status=400)
+        return response
     else:
-        return Response({"status": "error"}, status=400)
+        return Response({"message": "invalid access code"}, status=400)
 
 
 # POST /resend_access_code
@@ -206,29 +183,14 @@ def resend_access_code(request):
     phone_number = data['phone_number']
 
     try:
-        study_participant = StudyParticipant.objects.get(
-          phone_number=phone_number
-        )
+        study_participant = StudyParticipant.objects.get(phone_number=phone_number)
         otp_client = OtpClient()
+        sms_client = SmsClient()
         otp = otp_client.generate()
-        token = str(study_participant.token)
-        magic_link = f"http://localhost:3000/confirmation/{otp}/{token}"
-
-        if DEVELOPMENT_MODE:
-            print(magic_link)
-
-        sms_client.send_sms_magic_link(data['phone_number'], otp)
-
-        return Response({"status": "success", "token": token}, status=200)
+        sms_client.send_sms_access_code(phone_number, otp)
+        return Response({"message": "success"}, status=200)
     except:
-        return Response({"status": "invalid credentials"}, status=400)
-
-
-@api_view(['DELETE'])
-def logout(request):
-    response = Response(status=status.HTTP_204_NO_CONTENT)
-    response.delete_cookie('access_token')
-    return response
+        return Response({"message": "invalid credentials"}, status=400)
 
 
 # GET /api/current_user
@@ -236,5 +198,13 @@ def logout(request):
 def current_user(request):
     serializer = UserSerializer(request.user, context={"request": request})
     if request.user.username == "":
-        return Response({"status": "error"}, status=400)
+        return Response({"message": "error"}, status=400)
     return Response(serializer.data)
+
+
+# DELETE /api/logout
+@api_view(['DELETE'])
+def logout(request):
+    response = Response(status=status.HTTP_204_NO_CONTENT)
+    response.delete_cookie('access_token')
+    return response

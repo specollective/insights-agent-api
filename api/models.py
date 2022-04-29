@@ -1,11 +1,12 @@
 import uuid
 
-
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+from phonenumber_field.modelfields import PhoneNumberField
 
 #######################################################
 # Study Participant
@@ -13,9 +14,10 @@ from django.dispatch import receiver
 
 
 class StudyParticipant(models.Model):
+    full_name = models.CharField(max_length=400)
     approved = models.BooleanField(default=False)
     confirmed_phone_number = models.BooleanField(default=False)
-    phone_number = models.CharField(max_length=100)
+    phone_number = PhoneNumberField(blank=False)
     token = models.CharField(
         max_length=100,
         blank=True,
