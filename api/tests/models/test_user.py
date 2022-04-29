@@ -15,10 +15,5 @@ class UserTest(TestCase):
     def test_study_participant_phone_number_presence_validation(self):
         user1 = User.objects.create(username='example username')
 
-        try:
-            user2 = User.objects.create(username='example username')
-        except IntegrityError as e:
-            self.assertEqual(
-                str(e.__cause__),
-                "UNIQUE constraint failed: auth_user.username",
-             )
+        with self.assertRaises(IntegrityError):
+            User.objects.create(username='example username')
