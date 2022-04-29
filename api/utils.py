@@ -9,22 +9,18 @@ from api.models import Survey, DataEntry, StudyParticipant
 from django.db import transaction
 
 
-User = get_user_model()
-UTF = 'utf-8'
-
-
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
     study_participant = user.studyparticipant
-    fernet = Fernet(os.getenv('SECRET_KEY').encode(UTF))
-    survey_token = fernet.encrypt(study_participant.token.encode(UTF))
+    fernet = Fernet(os.getenv('SECRET_KEY').encode('utf-8'))
+    survey_token = fernet.encrypt(study_participant.token.encode('utf-8'))
 
     return {
         'status': 'success',
         'username': user.username,
         'refresh': refresh,
         'access': refresh.access_token,
-        'survey_token': survey_token.decode(UTF),
+        'survey_token': survey_token.decode('utf-8'),
     }
 
 
@@ -36,6 +32,7 @@ def create_study_participant(full_name, phone_number):
     if StudyParticipant.objects.filter(phone_number=phone_number).exists():
         return None
 
+    User = get_user_model()
     user = User.objects.create(username=str(uuid.uuid4()))
     user.password = str(uuid.uuid4())
     user.save()
@@ -62,8 +59,8 @@ def create_magic_link(token):
 
 
 def create_survey_token(token):
-    fernet = Fernet(os.getenv('SECRET_KEY').encode(UTF))
-    return fernet.encrypt(token.encode(UTF)).decode(UTF)
+    fernet = Fernet(os.getenv('SECRET_KEY').encode('utf-8'))
+    return fernet.encrypt(token.encode('utf-8')).decode('utf-8')
 
 
 def check_access_code_response_data(study_participant):

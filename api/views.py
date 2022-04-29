@@ -149,11 +149,13 @@ def check_access_code(request):
         study_participant.confirmed_phone_number = True
         study_participant.save()
 
+        survey_token = create_survey_token(study_participant.token)
         refresh = RefreshToken.for_user(study_participant.user)
         response_data = {
           "message": "success",
           "refresh_token": str(refresh),
           "access_token": str(refresh.access_token),
+          "survey_token": str(survey_token),
         }
 
         response = Response(response_data, status=200)
