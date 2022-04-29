@@ -1,4 +1,5 @@
 import os
+import sys
 import uuid
 from json import dumps as jsonDump
 
@@ -75,6 +76,8 @@ class AuthenticationAPITest(TestCase):
         )
         json = response.json()
         cookies = str(response.cookies)
+
+        print(cookies)
 
         # Assert that http only headers are being set
         self.assertTrue('HttpOnly;' in cookies)
@@ -172,36 +175,12 @@ class AuthenticationAPITest(TestCase):
 
         cookies = str(response.cookies)
 
-        # Assert that http only headers are being set
-        # self.assertFalse('HttpOnly; Max-Age=1209600' in cookies)
-        # self.assertFalse('Set-Cookie: access_token=' in cookies)
-        # self.assertFalse('access_token' in json)
+        print(cookies)
+
+        self.assertFalse('HttpOnly; Max-Age=1209600' in cookies)
+        self.assertFalse('Set-Cookie: access_token=' in cookies)
+        self.assertFalse('access_token' in json)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(json['message'], 'invalid access code')
         self.assertEqual(user.studyparticipant.confirmed_phone_number, False)
-    #
-    # def test_resend_access_code_post_request_success(self, mock_send_sms):
-    #     otp_client = OtpClient()
-    #     client = Client()
-    #
-    #     user = User.objects.create(username='Example Name')
-    #     user.studyparticipant.phone_number = '+18888888888'
-    #     user.studyparticipant.save()
-    #
-    #     response = client.post(
-    #         '/api/resend_access_code',
-    #         jsonDump({
-    #           "otp": otp_client.generate(),
-    #           "token": str(user.studyparticipant.token)
-    #         }),
-    #         content_type="application/json"
-    #     )
-    #
-    #     print(response.cookies)
-    #
-    #     json = response.json()
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(json['message'], 'success')
-    #     self.assertEqual(json['token'], str(user.studyparticipant.token))
-    #     self.assertEqual(user.studyparticipant.confirmed_phone_number, True)
