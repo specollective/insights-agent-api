@@ -157,9 +157,7 @@ def check_access_code(request):
           "access_token": str(refresh.access_token),
           "survey_token": str(survey_token),
         }
-
         response = Response(response_data, status=200)
-
         cookie_max_age = 3600 * 24 * 14
 
         response.set_cookie(
@@ -172,28 +170,6 @@ def check_access_code(request):
         return response
     else:
         return Response({"message": "invalid access code"}, status=400)
-
-    # otp_client = OtpClient()
-    # if otp_client.verify(data['otp']):
-    #     try:
-    #         study_participant.confirmed_phone_number = True
-    #         study_participant.save()
-    #
-    #         response_data = check_access_code_response_data(study_participant)
-    #         response = Response(response_data, status=200)
-    #         # Set HTTP only cookie
-    #         response.set_cookie(
-    #             'access_token',
-    #             response_data['access_token'],
-    #             max_age=COOKIE_MAX_AGE,
-    #             httponly=True
-    #         )
-    #
-    #         return response
-    #     except:
-    #         return Response({"message": "error", "message:": "something went wrong"}, status=400)
-    # else:
-    #      return Response({"message": "invalid access code"}, status=400)
 
 
 # POST /resend_access_code
