@@ -41,7 +41,6 @@ from api.utils import (
 User = get_user_model()
 DEBUG = os.getenv("DEBUG", "False") == "True"
 DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
-COOKIE_MAX_AGE = 3600 * 24 * 14
 
 ###############################################################
 # REST Framework ModelViewSets
@@ -157,7 +156,18 @@ def check_access_code(request):
           "access_token": str(refresh.access_token),
         }
 
-        return Response(response_data, status=200)
+        response = Response(response_data, status=200)
+
+        cookie_max_age = 3600 * 24 * 14
+
+        response.set_cookie(
+            'access_token',
+            response_data['access_token'],
+            max_age=cookie_max_age,
+            httponly=True
+        )
+
+        return response
     else:
         return Response({"message": "invalid access code"}, status=400)
 
