@@ -6,6 +6,7 @@ from cryptography.fernet import Fernet
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -17,34 +18,31 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from api.models import StudyParticipant, Survey
+from api.models import StudyParticipant, Survey, DataEntry
 from api.serializers import UserSerializer, GroupSerializer, SurveySerializer
-from api.services import SmsClient, OtpClient
-from api.models import Survey, DataEntry, StudyParticipant
 from api.services import SmsClient
+from api.services import SmsClient, OtpClient
+
 from api.serializers import (
-    UserSerializer,
+    DataEntrySerializer,
     GroupSerializer,
     SurveySerializer,
-    DataEntrySerializer
+    UserSerializer,
 )
+
 from api.utils import (
+    check_access_code_response_data,
+    create_magic_link,
+    create_study_participant,
+    create_survey_token,
+    find_study_participant_by_token,
     get_tokens_for_user,
     is_phone_number_taken,
-    create_study_participant,
-    create_magic_link,
-    create_survey_token,
-    check_access_code_response_data,
-    find_study_participant_by_token,
 )
 
 User = get_user_model()
 DEBUG = os.getenv("DEBUG", "False") == "True"
 DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
-
-###############################################################
-# REST Framework ModelViewSets
-###############################################################
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -65,16 +63,6 @@ class GroupViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class SurveyViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows surveys to be created.
-    """
-    queryset = Survey.objects.all()
-    serializer_class = SurveySerializer
-    permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['post']
-
-
 class DataEntryViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows data entries to be created.
@@ -86,9 +74,20 @@ class DataEntryViewSet(viewsets.ModelViewSet):
     http_method_names = ['post']
 
 
-###############################################################
-# Authentication API
-###############################################################
+@api_view(['POST'])
+def send_ping(request):
+    """
+    API endpoint to test sending sms message via API
+    """
+    data = loadJson(request.body.decode("utf-8"))
+
+    try:
+        sms_client = SmsClient()
+        sms_client.send_sms(data['phone_number'])
+        return Response({"message": "success"}, status=200)
+    except Exception as ex:
+        return Response({"message": "error"}, status=400)
+
 
 # POST /api/send_magic_link
 @api_view(['POST'])
@@ -102,7 +101,7 @@ def send_magic_link(request):
         sms_client = SmsClient()
         sms_client.send_sms(data['phone_number'])
         return Response({"message": "success"}, status=200)
-    except:
+    except Exception as ex:
         return Response({"message": "error"}, status=400)
 
 
@@ -128,7 +127,7 @@ def send_access_code(request):
         sms_client = SmsClient()
         sms_client.send_sms_magic_link(phone_number, magic_link)
         return Response({"message": "success", "token": token}, status=200)
-    except:
+    except Exception as ex:
         return Response({"message": "sms failed to send"}, status=400)
 
 
@@ -148,17 +147,14 @@ def check_access_code(request):
     if otp_client.verify(data['otp']):
         study_participant.confirmed_phone_number = True
         study_participant.save()
-
-        survey_token = create_survey_token(study_participant.token)
         refresh = RefreshToken.for_user(study_participant.user)
         response_data = {
           "message": "success",
           "refresh_token": str(refresh),
           "access_token": str(refresh.access_token),
-          "survey_token": str(survey_token),
         }
         response = Response(response_data, status=200)
-        cookie_max_age = 3600 * 24 * 14
+        cookie_max_age = 3600 * 24 * 14  # 14 days
 
         response.set_cookie(
             'access_token',
@@ -183,13 +179,15 @@ def resend_access_code(request):
     phone_number = data['phone_number']
 
     try:
-        study_participant = StudyParticipant.objects.get(phone_number=phone_number)
+        study_participant = StudyParticipant.objects.get(
+          phone_number=phone_number
+        )
         otp_client = OtpClient()
         sms_client = SmsClient()
         otp = otp_client.generate()
         sms_client.send_sms_access_code(phone_number, otp)
         return Response({"message": "success"}, status=200)
-    except:
+    except Exception as ex:
         return Response({"message": "invalid credentials"}, status=400)
 
 
@@ -208,3 +206,37 @@ def logout(request):
     response = Response(status=status.HTTP_204_NO_CONTENT)
     response.delete_cookie('access_token')
     return response
+
+
+# POST /api/surveys
+@api_view(['POST'])
+def surveys(request):
+    error_messages = None
+    data = loadJson(request.body.decode("utf-8"))
+    survey = Survey(
+      token=request.user.username,
+      age=data['age'],
+      gender=data['gender'],
+      marital_status=data['marital_status'],
+      hispanic_origin=data['hispanic_origin'] == 'true',
+      education_level=data['education_level'],
+    )
+
+    try:
+        survey.full_clean()
+    except ValidationError as e:
+        error_messages = e.message_dict
+        return Response(error_messages, status=400)
+
+    survey.save()
+    serializer = SurveySerializer(survey)
+
+    # TODO : Refactor to use rest framework
+    # serializer = SurveySerializer(data=request.data)
+    # if serializer.is_valid():
+    #   serializer.save()
+    #   return Response(serializer.data, status=status.HTTP_201_CREATED)
+    # else
+    #   return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(serializer.data, status=status.HTTP_201_CREATED)

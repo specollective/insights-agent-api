@@ -44,12 +44,9 @@ class SmsClient(object):
 
 class OtpClient(object):
     def verify(self, passcode):
-        totp = pyotp.TOTP('base32secret3232', interval=120)
+        totp = pyotp.TOTP('base32secret3232', interval=2000)
         return totp.verify(passcode)
 
     def generate(self):
-        totp = pyotp.TOTP('base32secret3232', interval=120)
+        totp = pyotp.TOTP('base32secret3232', interval=2000)
         return totp.now()
-
-
-# class EncryptionClient(object):

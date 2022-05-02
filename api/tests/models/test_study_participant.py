@@ -23,7 +23,6 @@ class StudyParticipantModelTest(TestCase):
         study_participant.save()
         self.assertEqual(study_participant.phone_number, '+18888888888')
 
-
     def test_study_participant_phone_number_presence_validation(self):
         user = User.objects.create(username='example username')
         study_participant = user.studyparticipant
@@ -36,14 +35,12 @@ class StudyParticipantModelTest(TestCase):
                 'This field cannot be blank.',
             )
 
-
     def test_study_participant_phone_number_unique_validation(self):
         user1 = User.objects.create(username='example username')
         study_participant1 = user1.studyparticipant
         study_participant1.full_name = 'full name'
         study_participant1.phone_number = '+18888888888'
         study_participant1.save()
-
         user2 = User.objects.create(username='example username 2')
         study_participant2 = user2.studyparticipant
         study_participant2.full_name = 'full name 2'
