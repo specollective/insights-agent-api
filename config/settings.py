@@ -184,7 +184,11 @@ CSRF_TRUSTED_ORIGINS = [
     'https://insights-agent-web-app.netlify.app',
 ]
 
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,10.0.0.250").split(",")
+# ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,10.0.0.250").split(",")
+ALLOWED_HOSTS = [
+  'insights-agent-api.specollective.org',
+  'insights-agent-web-app.netlify.app',
+]
 
 # ALLOWED_HOSTS = ['*']
 #    'localhost',
