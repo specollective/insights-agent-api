@@ -3,6 +3,7 @@ from django.test import TestCase, Client
 from rest_framework import status
 from api.models import StudyParticipant, DataEntry, Survey
 
+
 class DataEntryAPI(TestCase):
     """ Test module for DataEntry API """
 
@@ -21,6 +22,5 @@ class DataEntryAPI(TestCase):
             content_type="application/json"
         )
         response_data = response.json()
-
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response_data['application_name'], 'example')

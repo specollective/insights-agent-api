@@ -16,3 +16,4 @@ django-cors-headers==3.11.0
 cryptography==36.0.2
 django-phonenumber-field==6.1.0
 phonenumbers==8.12.47
+django-sslserver==0.22
