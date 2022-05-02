@@ -41,8 +41,9 @@ from api.utils import (
 )
 
 User = get_user_model()
-DEBUG = os.getenv("DEBUG", "False") == "True"
-DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEVELOPMENT_MODE = os.getenv('DEVELOPMENT_MODE', 'False') == 'True'
+AUTH_COOKIE_DOMAIN = None if DEVELOPMENT_MODE else 'insights-agent-web-app.netlify.app'
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -157,10 +158,13 @@ def check_access_code(request):
         cookie_max_age = 3600 * 24 * 14  # 14 days
 
         response.set_cookie(
-            'access_token',
-            response_data['access_token'],
+            key='access_token',
+            value=response_data['access_token'],
             max_age=cookie_max_age,
-            httponly=True
+            httponly=True,
+            secure=True,
+            samesite=None,
+            domain=AUTH_COOKIE_DOMAIN,
         )
 
         return response
