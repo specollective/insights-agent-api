@@ -173,7 +173,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://localhost:3000',
     'http://10.0.0.250:3000',
     'https://10.0.0.250:3000',
-    'https://insights-agent-web-app-svjhw.ondigitalocean.app',
+    'https://insights-agent-web-app-vgjqi.ondigitalocean.app',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -181,11 +181,11 @@ CSRF_TRUSTED_ORIGINS = [
     'https://localhost:3000',
     'http://10.0.0.250:3000',
     'https://10.0.0.250:3000',
-    'https://insights-agent-web-app-svjhw.ondigitalocean.app',
+    'https://insights-agent-web-app-vgjqi.ondigitalocean.app',
 ]
 
 DYNAMIC_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,10.0.0.250").split(",")
-STATIC_HOSTS = ['insights-agent-web-app-svjhw.ondigitalocean.app']
+STATIC_HOSTS = ['insights-agent-web-app-vgjqi.ondigitalocean.app']
 
 ALLOWED_HOSTS = DYNAMIC_HOSTS + STATIC_HOSTS
 
