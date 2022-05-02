@@ -164,7 +164,6 @@ def check_access_code(request):
             max_age=cookie_max_age,
             httponly=True,
             samesite=None,
-            domain=AUTH_COOKIE_DOMAIN,
         )
 
         return response
