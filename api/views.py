@@ -43,7 +43,8 @@ from api.utils import (
 User = get_user_model()
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 DEVELOPMENT_MODE = os.getenv('DEVELOPMENT_MODE', 'False') == 'True'
-AUTH_COOKIE_DOMAIN = None if DEVELOPMENT_MODE else 'insights-agent-web-app.netlify.app'
+PROD_COOKIE_DOMAIN = 'insights-agent-web-app-vgjqi.ondigitalocean.app'
+AUTH_COOKIE_DOMAIN = None if DEVELOPMENT_MODE else PROD_COOKIE_DOMAIN
 
 
 class UserViewSet(viewsets.ModelViewSet):
