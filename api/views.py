@@ -163,7 +163,7 @@ def check_access_code(request):
             value=response_data['access_token'],
             max_age=cookie_max_age,
             httponly=True,
-            samesite=None,
+            samesite='Lax',
             domain=PROD_COOKIE_DOMAIN,
         )
 
