@@ -188,6 +188,7 @@ DYNAMIC_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,10.0.0.25
 STATIC_HOSTS = [
   'localhost',
   'insights-agent-web-app-zr95k.ondigitalocean.app',
+  'django-application-boilerplate-szh3a.ondigitalocean.app',
 ]
 
 ALLOWED_HOSTS = DYNAMIC_HOSTS + STATIC_HOSTS
