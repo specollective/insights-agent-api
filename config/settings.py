@@ -184,20 +184,10 @@ CSRF_TRUSTED_ORIGINS = [
     'https://insights-agent-web-app.netlify.app',
 ]
 
-# ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,10.0.0.250").split(",")
-ALLOWED_HOSTS = [
-  'insights-agent-api.specollective.org',
-  'insights-agent-web-app.netlify.app',
-]
+DYNAMIC_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,10.0.0.250").split(",")
+STATIC_HOSTS = ['insights-agent-web-app.netlify.app']
 
-# ALLOWED_HOSTS = ['*']
-#    'localhost',
-#    '127.0.0.1',
-#    '0.0.0.0',
-#    '0.0.0.0:8080'
-#    'insights-agent-web-app.netlify.app',
-#    'insights-agent-api.specollective.org',
-# ]
+ALLOWED_HOSTS = DYNAMIC_HOSTS + STATIC_HOSTS
 
 CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding',
                       'content-type', 'accept', 'origin', 'authorization')
@@ -225,7 +215,7 @@ SIMPLE_JWT = {
   'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
   'AUTH_COOKIE': 'access_token',  # Cookie name. Enables cookies if value is set.
   'AUTH_COOKIE_DOMAIN': None,     # A string like "example.com", or None for standard domain cookie.
-  'AUTH_COOKIE_SECURE': False,    # Whether the auth cookies should be secure (https:// only).
+  'AUTH_COOKIE_SECURE': True,    # Whether the auth cookies should be secure (https:// only).
   'AUTH_COOKIE_HTTP_ONLY' : True, # Http only cookie flag.It's not fetch by javascript.
   'AUTH_COOKIE_PATH': '/',        # The path of the auth cookie.
   'AUTH_COOKIE_SAMESITE': 'Lax',  # Whether to set the flag restricting cookie leaks on cross-site requests.
