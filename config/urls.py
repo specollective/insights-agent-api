@@ -27,7 +27,7 @@ from rest_framework_simplejwt.views import (
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
-router.register(r'surveys', views.SurveyViewSet)
+# router.register(r'surveys', views.SurveyViewSet)
 router.register(r'data_entries', views.DataEntryViewSet)
 
 
@@ -38,6 +38,7 @@ urlpatterns = [
     path('api/send_access_code', views.send_access_code, name='send_access_code'),
     path('api/check_access_code', views.check_access_code, name='check_access_code'),
     path('api/resend_access_code', views.resend_access_code, name='resend_access_code'),
+    path('api/surveys', views.surveys, name='surveys'),
     path('api/logout', views.logout, name='logout'),
     path('api/current_user', views.current_user, name='current_user'),
     path('', include('pages.urls')),

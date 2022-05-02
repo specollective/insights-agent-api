@@ -1,12 +1,12 @@
 import os
 import uuid
-from django.db import IntegrityError
-from django.contrib.auth import get_user_model
-from rest_framework_simplejwt.tokens import RefreshToken
 from cryptography.fernet import Fernet
-from api.services import SmsClient, OtpClient
-from api.models import Survey, DataEntry, StudyParticipant
+from django.contrib.auth import get_user_model
+from django.db import IntegrityError
 from django.db import transaction
+from rest_framework_simplejwt.tokens import RefreshToken
+from api.models import Survey, DataEntry, StudyParticipant
+from api.services import SmsClient, OtpClient
 
 
 def get_tokens_for_user(user):

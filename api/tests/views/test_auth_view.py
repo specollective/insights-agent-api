@@ -36,11 +36,9 @@ class AuthenticationAPITest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json['message'], 'success')
 
-
     @mock.patch.object(SmsClient, 'send_sms_magic_link')
-    def test_send_access_code_post_request_error(self, mock_send_sms_magic_link):
+    def test_send_access_code_post_request_error(self, mock_sms):
         self.assertEqual(StudyParticipant.objects.count(), 0)
-
         client = Client()
         response = client.post(
             '/api/send_access_code',
@@ -48,24 +46,18 @@ class AuthenticationAPITest(TestCase):
             content_type="application/json"
         )
         json = response.json()
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json['message'], 'success')
         self.assertEqual(StudyParticipant.objects.count(), 1)
-        mock_send_sms_magic_link.assert_called_once
-
+        mock_sms.assert_called_once
 
     def test_check_access_code_post_request_success(self):
         otp_client = OtpClient()
         client = Client()
-
-        # Set up existing study participant
         user = User.objects.create(username='Example Name')
         user.studyparticipant.phone_number = '+18888888888'
         user.confirmed_phone_number = False
         user.studyparticipant.save()
-
-        # Make an API call
         response = client.post(
             '/api/check_access_code',
             jsonDump({
@@ -76,19 +68,12 @@ class AuthenticationAPITest(TestCase):
         )
         json = response.json()
         cookies = str(response.cookies)
-
-        # Assert that http only headers are being set
         self.assertTrue('HttpOnly;' in cookies)
         self.assertTrue('Set-Cookie: access_token=' in cookies)
         self.assertTrue(json['access_token'] in cookies)
-
-        # Assert that the request responds with the expected data.
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json['message'], 'success')
-        self.assertEqual(len(json['survey_token']), 140)
         self.assertEqual(len(json['refresh_token']), 229)
-
-        # Assert that we update the study participants confirmed_phone_number field.
         user.studyparticipant.refresh_from_db()
         self.assertEqual(user.studyparticipant.confirmed_phone_number, True)
 
@@ -109,11 +94,13 @@ class AuthenticationAPITest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(json['message'], 'error')
 
-
-    @mock.patch.object(SmsClient, 'send_sms_magic_link', side_effect=Exception('Bang!'))
+    @mock.patch.object(
+      SmsClient,
+      'send_sms_magic_link',
+      side_effect=Exception('Bang!'),
+    )
     def test_send_magic_link_post_request_error(self, mock_send_sms):
         self.assertEqual(StudyParticipant.objects.count(), 0)
-
         client = Client()
         response = client.post(
             '/api/send_access_code',
@@ -126,16 +113,13 @@ class AuthenticationAPITest(TestCase):
         self.assertEqual(json['message'], 'sms failed to send')
         self.assertEqual(StudyParticipant.objects.count(), 1)
 
-
     @mock.patch.object(SmsClient, 'send_sms_magic_link')
-    def test_send_access_code_with_existing_number_request_error(self, mock_send_sms):
+    def test_send_access_code_existing_num_request_error(self, mock_send_sms):
         user = User.objects.create(username='example username')
         study_participant = user.studyparticipant
         study_participant.phone_number = '+18888888888'
         study_participant.save()
-
         self.assertEqual(StudyParticipant.objects.count(), 1)
-
         client = Client()
         response = client.post(
             '/api/send_access_code',
@@ -143,22 +127,16 @@ class AuthenticationAPITest(TestCase):
             content_type="application/json"
         )
         response_data = response.json()
-
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response_data['message'], 'invalid credentials')
-
-        # Does not create a new study participant
         self.assertEqual(StudyParticipant.objects.count(), 1)
-
 
     def test_check_access_code_post_request_failure(self):
         otp_client = OtpClient()
         client = Client()
-
         user = User.objects.create(username='Example Name')
         user.studyparticipant.phone_number = '+18888888888'
         user.studyparticipant.save()
-
         response = client.post(
             '/api/check_access_code',
             jsonDump({
@@ -168,17 +146,11 @@ class AuthenticationAPITest(TestCase):
             content_type="application/json"
         )
         json = response.json()
-
         user.studyparticipant.refresh_from_db()
-
         cookies = str(response.cookies)
-
-        print(cookies)
-
         self.assertFalse('HttpOnly; Max-Age=1209600' in cookies)
         self.assertFalse('Set-Cookie: access_token=' in cookies)
         self.assertFalse('access_token' in json)
-
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(json['message'], 'invalid access code')
         self.assertEqual(user.studyparticipant.confirmed_phone_number, False)

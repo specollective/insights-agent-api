@@ -1,5 +1,7 @@
 # Insights Agent API
 
+🚧 This repository is actively under developed and should be consider unstable. 🚧
+
 # Contributing
 
 Clone repository the git repository.
@@ -72,3 +74,7 @@ curl -X POST http://localhost:8000/api/send_magic_link \
      -H 'Content-Type: application/json'
 ```
   **Note:** Right now, we are using a trial Twilio phone number for testing. Your phone number needs to be added to the verified caller list to be able to test sending messages to your phone number.
+
+14. Local SSL setup
+
+https://timonweb.com/django/https-django-development-server-ssl-certificate/

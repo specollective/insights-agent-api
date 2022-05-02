@@ -3,3 +3,5 @@ db.sqlite3
 .env
 staticfiles
 python-env
+cert.pem
+key.pem
