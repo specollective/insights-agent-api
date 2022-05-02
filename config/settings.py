@@ -185,7 +185,10 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 DYNAMIC_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,10.0.0.250").split(",")
-STATIC_HOSTS = ['insights-agent-web-app-zr95k.ondigitalocean.app']
+STATIC_HOSTS = [
+  'localhost',
+  'insights-agent-web-app-zr95k.ondigitalocean.app',
+]
 
 ALLOWED_HOSTS = DYNAMIC_HOSTS + STATIC_HOSTS
 
