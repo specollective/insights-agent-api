@@ -43,8 +43,14 @@ from api.utils import (
 User = get_user_model()
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 DEVELOPMENT_MODE = os.getenv('DEVELOPMENT_MODE', 'False') == 'True'
-PROD_COOKIE_DOMAIN = 'insights-agent-web-app-zr95k.ondigitalocean.app'
-AUTH_COOKIE_DOMAIN = None if DEVELOPMENT_MODE else PROD_COOKIE_DOMAIN
+DEV_COOKIE_DOMAIN = 'localhost'
+PROD_COOKIE_DOMAIN = 'ondigitalocean.app'
+
+if DEVELOPMENT_MODE:
+    AUTH_COOKIE_DOMAIN = DEV_COOKIE_DOMAIN
+else:
+    AUTH_COOKIE_DOMAIN = PROD_COOKIE_DOMAIN
+
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -164,8 +170,7 @@ def check_access_code(request):
             max_age=cookie_max_age,
             httponly=True,
             samesite='Lax',
-            domain=PROD_COOKIE_DOMAIN,
-            # domain=PROD_COOKIE_DOMAIN,
+            domain=AUTH_COOKIE_DOMAIN,
         )
 
         return response
