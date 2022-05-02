@@ -1,5 +1,7 @@
 # Insights Agent API
 
+🚧 This repository is actively under developed and should be consider unstable. 🚧
+
 # Contributing
 
 Clone repository the git repository.
