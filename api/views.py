@@ -44,7 +44,7 @@ User = get_user_model()
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 DEVELOPMENT_MODE = os.getenv('DEVELOPMENT_MODE', 'False') == 'True'
 DEV_COOKIE_DOMAIN = 'localhost'
-PROD_COOKIE_DOMAIN = 'insights-agent-web-app-zr95k.ondigitalocean.app'
+PROD_COOKIE_DOMAIN = 'ondigitalocean.app'
 
 if DEVELOPMENT_MODE:
     AUTH_COOKIE_DOMAIN = DEV_COOKIE_DOMAIN
