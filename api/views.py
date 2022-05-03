@@ -165,11 +165,12 @@ def check_access_code(request):
         cookie_max_age = 3600 * 24 * 14  # 14 days
 
         response.set_cookie(
-            key='access_token',
+            'access_token',
             value=response_data['access_token'],
             max_age=cookie_max_age,
+            expires=None,
             httponly=True,
-            samesite='Lax',
+            samesite='None',
             domain=AUTH_COOKIE_DOMAIN,
             secure=True,
         )
