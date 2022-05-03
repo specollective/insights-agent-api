@@ -173,7 +173,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://localhost:3000',
     'http://10.0.0.250:3000',
     'https://10.0.0.250:3000',
-    'https://insights-agent-web-app-zr95k.ondigitalocean.app',
+    'https://insights-agent-web-app.specollective.org',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -181,20 +181,20 @@ CSRF_TRUSTED_ORIGINS = [
     'https://localhost:3000',
     'http://10.0.0.250:3000',
     'https://10.0.0.250:3000',
-    'https://insights-agent-web-app-zr95k.ondigitalocean.app',
+    'https://insights-agent-web-app.specollective.org',
 ]
 
 DYNAMIC_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,10.0.0.250").split(",")
-STATIC_HOSTS = [
-  'localhost',
-  'insights-agent-web-app-zr95k.ondigitalocean.app',
-  'django-application-boilerplate-szh3a.ondigitalocean.app',
-]
-
+STATIC_HOSTS = ['localhost', 'insights-agent-web-app.specollective.org']
 ALLOWED_HOSTS = DYNAMIC_HOSTS + STATIC_HOSTS
 
-CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding',
-                      'content-type', 'accept', 'origin', 'authorization')
+CORS_ALLOW_HEADERS = [
+  'accept-encoding',
+  'authorization',
+  'content-disposition',
+  'content-type', 'accept',
+  'origin',
+]
 
 SESSION_COOKIE_PATH = '/;HttpOnly'
 CORS_ALLOW_CREDENTIALS = True
