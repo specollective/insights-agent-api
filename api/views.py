@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
 from rest_framework import permissions
 from rest_framework import status
@@ -181,26 +182,35 @@ def check_access_code(request):
 
 
 # POST /resend_access_code
-@api_view(['POST'])
+# @api_view(['POST'])
 def resend_access_code(request):
     """
     API endpoint sends a magic link to the user
     """
-    # 1. Parse request parameters.
-    data = loadJson(request.body.decode("utf-8"))
-    phone_number = data['phone_number']
 
-    try:
-        study_participant = StudyParticipant.objects.get(
-          phone_number=phone_number
-        )
-        otp_client = OtpClient()
-        sms_client = SmsClient()
-        otp = otp_client.generate()
-        sms_client.send_sms_access_code(phone_number, otp)
-        return Response({"message": "success"}, status=200)
-    except Exception as ex:
-        return Response({"message": "invalid credentials"}, status=400)
+    # data = loadJson(request.body.decode("utf-8"))
+    # phone_number = data['phone_number']
+    #
+    #
+    # try:
+    #     study_participant = StudyParticipant.objects.get(
+    #       phone_number=phone_number
+    #     )
+    #     otp_client = OtpClient()
+    #     sms_client = SmsClient()
+    #     otp = otp_client.generate()
+    #     sms_client.send_sms_access_code(phone_number, otp)
+    #     return Response({"message": "success"}, status=200)
+    # except Exception as ex:
+    #     return Response({"message": "invalid credentials"}, status=400)
+
+    response = JsonResponse({"message": "success"}, status=200)
+    response["Access-Control-Allow-Origin"] = "*"
+    response["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+    response["Access-Control-Max-Age"] = "1000"
+    response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
+
+    return response
 
 
 # GET /api/current_user
