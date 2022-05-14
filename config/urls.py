@@ -34,7 +34,6 @@ router.register(r'data_entries', views.DataEntryViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('api/send_magic_link', views.send_magic_link, name='send_magic_link'),
     path('api/send_access_code', views.send_access_code, name='send_access_code'),
     path('api/check_access_code', views.check_access_code, name='check_access_code'),
     path('api/resend_access_code', views.resend_access_code, name='resend_access_code'),
