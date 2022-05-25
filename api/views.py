@@ -140,6 +140,7 @@ def check_access_code(request):
 
 
 # POST /resend_access_code
+@csrf_exempt
 def resend_access_code(request):
     """
     API endpoint sends a magic link to the user
