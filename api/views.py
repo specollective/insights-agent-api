@@ -2,7 +2,6 @@ import os
 import uuid
 from json import loads as loadJson
 from cryptography.fernet import Fernet
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
@@ -11,26 +10,22 @@ from django.db import IntegrityError
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
 from api.models import StudyParticipant, Survey, DataEntry
 from api.serializers import UserSerializer, GroupSerializer, SurveySerializer
 from api.services import SmsClient
 from api.services import SmsClient, OtpClient
-
 from api.serializers import (
     DataEntrySerializer,
     GroupSerializer,
     SurveySerializer,
     UserSerializer,
 )
-
 from api.utils import (
     check_access_code_response_data,
     create_magic_link,
@@ -43,15 +38,9 @@ from api.utils import (
 
 User = get_user_model()
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
-DEVELOPMENT_MODE = os.getenv('DEVELOPMENT_MODE', 'False') == 'True'
-DEV_COOKIE_DOMAIN = 'localhost'
-PROD_COOKIE_DOMAIN = '.specollective.org'
-
-if DEVELOPMENT_MODE:
-    AUTH_COOKIE_DOMAIN = DEV_COOKIE_DOMAIN
-else:
-    AUTH_COOKIE_DOMAIN = PROD_COOKIE_DOMAIN
-
+# DEVELOPMENT_MODE = os.getenv('DEVELOPMENT_MODE', 'False') == 'True'
+DEVELOPMENT_MODE = os.environ.get('DEVELOPMENT_MODE', 'False') == 'True'
+AUTH_COOKIE_DOMAIN = 'localhost' if DEVELOPMENT_MODE else '.specollective.org'
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -81,37 +70,6 @@ class DataEntryViewSet(viewsets.ModelViewSet):
     # TODO: Apply permissions
     permission_classes = []
     http_method_names = ['post']
-
-
-@api_view(['POST'])
-def send_ping(request):
-    """
-    API endpoint to test sending sms message via API
-    """
-    data = loadJson(request.body.decode("utf-8"))
-
-    try:
-        sms_client = SmsClient()
-        sms_client.send_sms(data['phone_number'])
-        return Response({"message": "success"}, status=200)
-    except Exception as ex:
-        return Response({"message": "error"}, status=400)
-
-
-# POST /api/send_magic_link
-@api_view(['POST'])
-def send_magic_link(request):
-    """
-    API endpoint sends a magic link to the user
-    """
-    data = loadJson(request.body.decode("utf-8"))
-
-    try:
-        sms_client = SmsClient()
-        sms_client.send_sms(data['phone_number'])
-        return Response({"message": "success"}, status=200)
-    except Exception as ex:
-        return Response({"message": "error"}, status=400)
 
 
 # POST /api/send_access_code
@@ -188,29 +146,30 @@ def resend_access_code(request):
     API endpoint sends a magic link to the user
     """
 
-    # data = loadJson(request.body.decode("utf-8"))
-    # phone_number = data['phone_number']
-    #
-    #
-    # try:
-    #     study_participant = StudyParticipant.objects.get(
-    #       phone_number=phone_number
-    #     )
-    #     otp_client = OtpClient()
-    #     sms_client = SmsClient()
-    #     otp = otp_client.generate()
-    #     sms_client.send_sms_access_code(phone_number, otp)
-    #     return Response({"message": "success"}, status=200)
-    # except Exception as ex:
-    #     return Response({"message": "invalid credentials"}, status=400)
+    data = loadJson(request.body.decode("utf-8"))
+    phone_number = data['phone_number']
+    response = JsonResponse({})
 
-    response = JsonResponse({"message": "success"}, status=200)
     response["Access-Control-Allow-Origin"] = "*"
     response["Access-Control-Allow-Methods"] = "GET, OPTIONS"
     response["Access-Control-Max-Age"] = "1000"
     response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
 
-    return response
+    try:
+        study_participant = StudyParticipant.objects.get(
+          phone_number=phone_number
+        )
+        otp_client = OtpClient()
+        sms_client = SmsClient()
+        otp = otp_client.generate()
+        sms_client.send_sms_access_code(phone_number, otp)
+        response.content = b'{"message": "success"}'
+        response.status_code = 200
+        return response
+    except Exception as ex:
+        response.content = b'{"message": "invalid credentials"}'
+        response.status_code = 400
+        return response
 
 
 # GET /api/current_user
