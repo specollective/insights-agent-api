@@ -56,6 +56,6 @@ def create_study_participant(sender, instance, created, **kwargs):
         StudyParticipant.objects.create(user=instance)
 
 
-@receiver(post_save, sender=User)
-def save_study_participant(sender, instance, **kwargs):
-    instance.studyparticipant.save()
+# @receiver(post_save, sender=User)
+# def save_study_participant(sender, instance, **kwargs):
+#     instance.studyparticipant.save()
