@@ -5,3 +5,4 @@ staticfiles
 python-env
 cert.pem
 key.pem
+DEV_NOTES

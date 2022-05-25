@@ -140,7 +140,6 @@ def check_access_code(request):
 
 
 # POST /resend_access_code
-# @api_view(['POST'])
 def resend_access_code(request):
     """
     API endpoint sends a magic link to the user
@@ -151,7 +150,7 @@ def resend_access_code(request):
     response = JsonResponse({})
 
     response["Access-Control-Allow-Origin"] = "*"
-    response["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+    response["Access-Control-Allow-Methods"] = "POST, OPTIONS"
     response["Access-Control-Max-Age"] = "1000"
     response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
 
