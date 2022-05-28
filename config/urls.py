@@ -27,25 +27,17 @@ from rest_framework_simplejwt.views import (
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
-# router.register(r'surveys', views.SurveyViewSet)
 router.register(r'data_entries', views.DataEntryViewSet)
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/send_magic_link', views.send_magic_link, name='send_magic_link'),
+    path('api/confirm_magic_link', views.confirm_magic_link, name='confirm_magic_link'),
     path('api/send_access_code', views.send_access_code, name='send_access_code'),
-    path('api/check_access_code', views.check_access_code, name='check_access_code'),
-    path('api/resend_access_code', views.resend_access_code, name='resend_access_code'),
+    path('api/confirm_access_code', views.confirm_access_code, name='confirm_access_code'),
     path('api/surveys', views.surveys, name='surveys'),
     path('api/logout', views.logout, name='logout'),
     path('api/current_user', views.current_user, name='current_user'),
     path('', include('pages.urls')),
 ]
-
-# Cruft
-# path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-# path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-# path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-# path('projects/', include('projects.urls')),
-# path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
