@@ -69,8 +69,8 @@ curl -X POST http://localhost:8000/api/projects/ \
 
 12. Test basic SMS API
 ```
-curl -X POST http://localhost:8000/api/send_magic_link \
-     -d '{"phone_number": "TEST_PHONE_NUMBER", "name": "John Shmo"}' \
+curl -X POST https://insights-agent-api.specollective.org/api/resend_access_code \
+     -d '{"phone_number": "+18888888888", "name": "John Shmo"}' \
      -H 'Content-Type: application/json'
 ```
   **Note:** Right now, we are using a trial Twilio phone number for testing. Your phone number needs to be added to the verified caller list to be able to test sending messages to your phone number.
@@ -78,3 +78,14 @@ curl -X POST http://localhost:8000/api/send_magic_link \
 14. Local SSL setup
 
 https://timonweb.com/django/https-django-development-server-ssl-certificate/
+
+15. Cors resources
+
+Set-cookies for cross-origin requests
+https://stackoverflow.com/questions/46288437/set-cookies-for-cross-origin-requests
+
+Changing local domain
+https://stackoverflow.com/questions/58715204/how-to-change-the-domain-name-on-a-local-deployed-react-app
+
+A practical, Complete Tutorial on HTTP cookies
+https://www.valentinog.com/blog/cookies

@@ -27,7 +27,6 @@ from api.serializers import (
     UserSerializer,
 )
 from api.utils import (
-    check_access_code_response_data,
     create_magic_link,
     create_study_participant,
     create_survey_token,
@@ -72,9 +71,9 @@ class DataEntryViewSet(viewsets.ModelViewSet):
     http_method_names = ['post']
 
 
-# POST /api/send_access_code
+# POST /api/send_magic_link
 @api_view(['POST'])
-def send_access_code(request):
+def send_magic_link(request):
     """
     API endpoint sends a magic link to the user
     """
@@ -98,18 +97,20 @@ def send_access_code(request):
         return Response({"message": "sms failed to send"}, status=400)
 
 
-# POST /api/check_access_code
+# POST /api/confirm_magic_link
 @api_view(['POST'])
-def check_access_code(request):
+def confirm_magic_link(request):
     """
-    API endpoint checks one-time passcode
+    API endpoint checks magic link code
     """
     data = loadJson(request.body.decode("utf-8"))
 
+    # 1. Find the study particpant by their token
     study_participant = find_study_participant_by_token(data['token'])
     if study_participant is None:
         return Response({"message": "invalid credentials"}, status=400)
 
+    # 2. Verify the one-time password
     otp_client = OtpClient()
     if otp_client.verify(data['otp']):
         study_participant.confirmed_phone_number = True
@@ -139,9 +140,9 @@ def check_access_code(request):
         return Response({"message": "invalid access code"}, status=400)
 
 
-# POST /resend_access_code
+# POST /api/send_access_code
 @csrf_exempt
-def resend_access_code(request):
+def send_access_code(request):
     """
     API endpoint sends a magic link to the user
     """
@@ -154,6 +155,47 @@ def resend_access_code(request):
     response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     response["Access-Control-Max-Age"] = "1000"
     response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
+
+    try:
+        study_participant = StudyParticipant.objects.get(
+          phone_number=phone_number
+        )
+        otp_client = OtpClient()
+        sms_client = SmsClient()
+        otp = otp_client.generate()
+        sms_client.send_sms_access_code(phone_number, otp)
+        response.content = b'{"message": "success"}'
+        response.status_code = 200
+        return response
+    except Exception as ex:
+        response.content = b'{"message": "invalid credentials"}'
+        response.status_code = 400
+        return response
+
+
+# POST /api/confirm_access_code
+@csrf_exempt
+def confirm_access_code(request):
+    """
+    API endpoint confirms access code
+    """
+
+    data = loadJson(request.body.decode("utf-8"))
+    access_code = data['access_code']
+    response = JsonResponse({})
+
+    response["Access-Control-Allow-Origin"] = "*"
+    response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response["Access-Control-Max-Age"] = "1000"
+    response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
+
+    otp_client = OtpClient()
+    if otp_client.verify(access_code):
+        response.content = b'{"message": "success"}'
+        response.status_code = 200
+        return response
+    else:
+        return JsonResponse({"message": "invalid access code"}, status=400)
 
     try:
         study_participant = StudyParticipant.objects.get(
