@@ -33,6 +33,7 @@ class SmsClient(object):
 
     def send_sms_access_code(self, phone_number, otp):
         if (not self.sms_enabled):
+            print(otp)
             return False
 
         return self.client.messages.create(

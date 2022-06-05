@@ -44,7 +44,7 @@ class DataEntry(models.Model):
     tab_name = models.CharField(max_length=200)
     url = models.URLField(max_length=200)
     timestamp = models.DateTimeField()
-    token = models.CharField(max_length=200, blank=True, unique=True)
+    token = models.CharField(max_length=200, blank=True)
 
     class Meta:
         verbose_name_plural = "Data Entries"

@@ -89,3 +89,12 @@ https://stackoverflow.com/questions/58715204/how-to-change-the-domain-name-on-a-
 
 A practical, Complete Tutorial on HTTP cookies
 https://www.valentinog.com/blog/cookies
+
+
+curl -X POST http://localhost:8000/api/send_access_code \
+  -d '{"phone_number": "+18888888888"}' \
+  -H 'Content-Type: application/json'
+
+curl -X POST http://localhost:8000/api/confirm_access_code \
+  -d '{"access_code": "366997"}' \
+  -H 'Content-Type: application/json'
