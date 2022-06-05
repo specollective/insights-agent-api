@@ -184,7 +184,10 @@ def send_access_code(request):
         sms_client.send_sms_access_code(phone_number, otp)
 
         # 5. Build base JSON response object
-        response = JsonResponse({ "message": "success" }, status=200)
+        response = JsonResponse({
+            "message": "success",
+            "token": str(study_participant.token),
+        }, status=200)
 
         # 6. Set headers for CORS
         response["Access-Control-Allow-Origin"] = "*"

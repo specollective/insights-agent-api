@@ -141,6 +141,7 @@ class AuthenticationAPITest(TestCase):
         self.assertEqual(response.headers["Access-Control-Allow-Origin"], "*")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json['message'], 'success')
+        self.assertEqual(json['token'], str(user.studyparticipant.token))
         mock_send_sms.assert_called_once
 
     @mock.patch.object(SmsClient, 'send_sms_access_code')
