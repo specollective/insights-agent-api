@@ -174,6 +174,7 @@ class AuthenticationAPITest(TestCase):
             '/api/confirm_access_code',
             jsonDump({
               "access_code": otp_client.generate(),
+              "token": str(user.studyparticipant.token),
             }),
             content_type="application/json"
         )
