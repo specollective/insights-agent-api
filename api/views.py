@@ -1,7 +1,8 @@
+# Python standard library dependencies
 import os
 import uuid
 from json import loads as loadJson
-from cryptography.fernet import Fernet
+# Django dependencies
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
@@ -10,12 +11,15 @@ from django.db import IntegrityError
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+# Django REST Framework dependencies
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+# Application dependencies
 from api.models import StudyParticipant, Survey, DataEntry
 from api.serializers import UserSerializer, GroupSerializer, SurveySerializer
 from api.services import SmsClient
@@ -34,13 +38,16 @@ from api.utils import (
     get_tokens_for_user,
     is_phone_number_taken,
 )
-
+# Variable initialization
 User = get_user_model()
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 # DEVELOPMENT_MODE = os.getenv('DEVELOPMENT_MODE', 'False') == 'True'
 DEVELOPMENT_MODE = os.environ.get('DEVELOPMENT_MODE', 'False') == 'True'
 AUTH_COOKIE_DOMAIN = 'localhost' if DEVELOPMENT_MODE else '.specollective.org'
 
+##################################################
+# Django REST Framework API endpoints
+##################################################
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -68,8 +75,11 @@ class DataEntryViewSet(viewsets.ModelViewSet):
     serializer_class = DataEntrySerializer
     # TODO: Apply permissions
     permission_classes = []
-    http_method_names = ['post']
+    http_method_names = ['post', 'get']
 
+##################################################
+# Authentication API endpoints
+##################################################
 
 # POST /api/send_magic_link
 @api_view(['POST'])
@@ -81,14 +91,17 @@ def send_magic_link(request):
     data = loadJson(request.body.decode("utf-8"))
     full_name = data['full_name']
     phone_number = data['phone_number']
-    study_participant = create_study_participant(full_name, phone_number)
 
+    # 2. Create study particpant
+    study_participant = create_study_participant(full_name, phone_number)
     if study_participant is None:
         return Response({"message": "invalid credentials"}, status=400)
 
+    # 3. Generate magic link
     token = str(study_participant.token)
     magic_link = create_magic_link(token)
 
+    # 4. Send magic link
     try:
         sms_client = SmsClient()
         sms_client.send_sms_magic_link(phone_number, magic_link)
@@ -103,31 +116,37 @@ def confirm_magic_link(request):
     """
     API endpoint checks magic link code
     """
+    # 1. Parse request parameters.
     data = loadJson(request.body.decode("utf-8"))
 
-    # 1. Find the study particpant by their token
+    # 2. Find the study particpant by their token
     study_participant = find_study_participant_by_token(data['token'])
     if study_participant is None:
         return Response({"message": "invalid credentials"}, status=400)
 
-    # 2. Verify the one-time password
+    # 3. Verify the one-time password
     otp_client = OtpClient()
     if otp_client.verify(data['otp']):
+        # 4. Set confirmed phone number to true and save record.
         study_participant.confirmed_phone_number = True
         study_participant.save()
+
+        # 5. Generate JWT access tokens
         refresh = RefreshToken.for_user(study_participant.user)
         response_data = {
           "message": "success",
           "refresh_token": str(refresh),
           "access_token": str(refresh.access_token),
         }
-        response = Response(response_data, status=200)
-        cookie_max_age = 3600 * 24 * 14  # 14 days
 
+        # 6. Create base JSON response
+        response = Response(response_data, status=200)
+
+        # 7. Set HTTP only cookie
         response.set_cookie(
             'access_token',
             value=response_data['access_token'],
-            max_age=cookie_max_age,
+            max_age=(3600 * 24 * 14),
             expires=None,
             httponly=True,
             samesite='None',
@@ -146,77 +165,88 @@ def send_access_code(request):
     """
     API endpoint sends a magic link to the user
     """
-
+    # 1. Parse request parameters.
     data = loadJson(request.body.decode("utf-8"))
     phone_number = data['phone_number']
-    response = JsonResponse({})
-
-    response["Access-Control-Allow-Origin"] = "*"
-    response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-    response["Access-Control-Max-Age"] = "1000"
-    response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
 
     try:
+        # 2. Find study participant by phone number
         study_participant = StudyParticipant.objects.get(
           phone_number=phone_number
         )
+
+        # 3. Generate one-time passcode
         otp_client = OtpClient()
-        sms_client = SmsClient()
         otp = otp_client.generate()
+
+        # 4. Sent OTP via SMS
+        sms_client = SmsClient()
         sms_client.send_sms_access_code(phone_number, otp)
-        response.content = b'{"message": "success"}'
-        response.status_code = 200
+
+        # 5. Build base JSON response object
+        response = JsonResponse({
+          "message": "success",
+          "token": study_participant.token,
+        })
+
+        # 6. Set headers for CORS
+        response["Access-Control-Allow-Origin"] = "*"
+        response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        response["Access-Control-Max-Age"] = "1000"
+        response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
+
         return response
     except Exception as ex:
-        response.content = b'{"message": "invalid credentials"}'
-        response.status_code = 400
-        return response
+        return JsonResponse({ "message": 'invalid credentials' }, status=400)
 
 
 # POST /api/confirm_access_code
 @csrf_exempt
 def confirm_access_code(request):
     """
-    API endpoint confirms access code
+    API endpoint to confirm access code
     """
-
+    # 1. Parse request parameters.
     data = loadJson(request.body.decode("utf-8"))
     access_code = data['access_code']
-    response = JsonResponse({})
 
-    response["Access-Control-Allow-Origin"] = "*"
-    response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-    response["Access-Control-Max-Age"] = "1000"
-    response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
+    jwtAuth = JWTAuthentication()
 
+    # 2. Find the study particpant by their token
+    study_participant = find_study_participant_by_token(data['token'])
+    if study_participant is None:
+        return Response({"message": "invalid credentials"}, status=400)
+
+    # 3. Verify one-time passcode
     otp_client = OtpClient()
     if otp_client.verify(access_code):
-        response.content = b'{"message": "success"}'
-        response.status_code = 200
+        # 5. Create survey token
+        survey_token = create_survey_token(study_participant.token)
+
+        # 6. Build base JSON response object.
+        response = JsonResponse({
+          "message": "success",
+          "survey_token": survey_token,
+        })
+
+        # 7. Set headers for CORS
+        response["Access-Control-Allow-Origin"] = "*"
+        response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        response["Access-Control-Max-Age"] = "1000"
+        response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
+
+        # 8. Return response object.
         return response
     else:
         return JsonResponse({"message": "invalid access code"}, status=400)
-
-    try:
-        study_participant = StudyParticipant.objects.get(
-          phone_number=phone_number
-        )
-        otp_client = OtpClient()
-        sms_client = SmsClient()
-        otp = otp_client.generate()
-        sms_client.send_sms_access_code(phone_number, otp)
-        response.content = b'{"message": "success"}'
-        response.status_code = 200
-        return response
-    except Exception as ex:
-        response.content = b'{"message": "invalid credentials"}'
-        response.status_code = 400
-        return response
 
 
 # GET /api/current_user
 @api_view(['GET'])
 def current_user(request):
+    """
+    API endpoint to fetch a current user
+    """
     serializer = UserSerializer(request.user, context={"request": request})
     if request.user.username == "":
         return Response({"message": "error"}, status=400)
@@ -226,6 +256,9 @@ def current_user(request):
 # DELETE /api/logout
 @api_view(['DELETE'])
 def logout(request):
+    """
+    API endpoint to logout a current user
+    """
     response = Response(status=status.HTTP_204_NO_CONTENT)
     response.delete_cookie('access_token')
     return response
@@ -234,6 +267,9 @@ def logout(request):
 # POST /api/surveys
 @api_view(['POST'])
 def surveys(request):
+    """
+    API endpoint to submit a survey
+    """
     error_messages = None
     data = loadJson(request.body.decode("utf-8"))
     survey = Survey(

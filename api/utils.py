@@ -34,6 +34,7 @@ def create_study_participant(full_name, phone_number):
 
     User = get_user_model()
     user = User.objects.create(username=str(uuid.uuid4()))
+
     user.password = str(uuid.uuid4())
     user.save()
 
