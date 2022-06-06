@@ -10,6 +10,55 @@ git clone git@github.com:specollective/insights-agent-api.git
 cd insights-agent-api
 ```
 
+## Software Architecture
+
+This service exposes a RESTful JSON API and administration panel for the Insights Agent application.
+
+## File Directory Structure
+
+```
+├── README.md
+├── api
+│   ├── __init__.py
+│   ├── __pycache__
+│   ├── admin.py
+│   ├── apps.py
+│   ├── auth.py
+│   ├── migrations
+│   ├── models.py
+│   ├── serializers.py
+│   ├── services.py
+│   ├── tests
+│   ├── utils.py
+│   └── views.py
+├── bin
+│   ├── docs
+│   ├── install
+│   ├── lint
+│   ├── serve
+│   └── test
+├── config
+│   ├── __init__.py
+│   ├── __pycache__
+│   ├── asgi.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── manage.py
+├── pages
+│   ├── __init__.py
+│   ├── __pycache__
+│   ├── admin.py
+│   ├── apps.py
+│   ├── migrations
+│   ├── models.py
+│   ├── templates
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+└── requirements.txt
+```
+
 # Development Environment (localhost)
 
 1. Set up environment variables
