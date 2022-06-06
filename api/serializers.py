@@ -36,4 +36,5 @@ class DataEntrySerializer(serializers.HyperlinkedModelSerializer):
             'tab_name',
             'url',
             'timestamp',
+            'internet_connection',
         ]
