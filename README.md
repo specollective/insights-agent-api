@@ -1,6 +1,8 @@
 # Insights Agent API
 
-🚧 This repository is actively under developed and should be consider unstable. 🚧
+🚧 This repository is actively under development and should be consider unstable. 🚧
+
+This service exposes a RESTful JSON API and administration panel for the Insights Agent application.
 
 # Contributing
 
@@ -11,10 +13,6 @@ cd insights-agent-api
 ```
 
 ## Software Architecture
-
-This service exposes a RESTful JSON API and administration panel for the Insights Agent application.
-
-## File Directory Structure
 
 ```
 ├── README.md
