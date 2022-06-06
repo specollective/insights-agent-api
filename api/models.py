@@ -41,10 +41,11 @@ class DataEntry(models.Model):
     """Represents a single activity data point."""
 
     application_name = models.CharField(max_length=200)
-    tab_name = models.CharField(max_length=200)
-    url = models.URLField(max_length=200)
+    tab_name = models.CharField(max_length=200, blank=True)
+    url = models.URLField(max_length=200, blank=True)
     timestamp = models.DateTimeField()
     token = models.CharField(max_length=200, blank=True)
+    internet_connection = models.CharField(max_length=200, blank=True)
 
     class Meta:
         verbose_name_plural = "Data Entries"
