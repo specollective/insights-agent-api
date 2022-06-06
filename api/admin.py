@@ -38,10 +38,11 @@ class SurveyAdmin(admin.ModelAdmin):
 
 class DataEntryAdmin(admin.ModelAdmin):
     list_display = (
-      "token",
+      "identifier",
       "application_name",
       "tab_name",
       "url",
+      "internet_connection",
       "timestamp",
     )
 
