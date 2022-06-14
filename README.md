@@ -107,26 +107,20 @@ import ipdb
 ipdb.set_trace()
 ```
 
-11. Test basic project API
-```
-curl -X POST http://localhost:8000/api/projects/ \
-     -d '{"title": "Example title", "description": "Example description"}' \
-     -H 'Content-Type: application/json'
-```
-
-12. Test basic SMS API
+11. Test basic SMS API
 ```
 curl -X POST https://insights-agent-api.specollective.org/api/resend_access_code \
      -d '{"phone_number": "+18888888888", "name": "John Shmo"}' \
      -H 'Content-Type: application/json'
 ```
-  **Note:** Right now, we are using a trial Twilio phone number for testing. Your phone number needs to be added to the verified caller list to be able to test sending messages to your phone number.
 
-14. Local SSL setup
+**Note:** Right now, we are using a trial Twilio phone number for testing. Your phone number needs to be added to the verified caller list to be able to test sending messages to your phone number.
+
+12. Local SSL setup
 
 https://timonweb.com/django/https-django-development-server-ssl-certificate/
 
-15. Cors resources
+# Cors resources
 
 Set-cookies for cross-origin requests
 https://stackoverflow.com/questions/46288437/set-cookies-for-cross-origin-requests
