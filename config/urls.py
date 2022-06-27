@@ -24,15 +24,18 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
-
+# Initial routers
 router = routers.DefaultRouter()
 bulk_router = BulkRouter()
 
+# Register regular routes
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
-bulk_router.register(r'data_entries', views.DataEntryViewSet)
-# bulk_router.register(r'data_entries', views.BulkDataEntryViewSet)
 
+# Register bulk routes
+bulk_router.register(r'data_entries', views.DataEntryViewSet)
+
+# Set url patterns
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
