@@ -38,6 +38,12 @@ from api.utils import (
     get_tokens_for_user,
     is_phone_number_taken,
 )
+from rest_framework_bulk import (
+  BulkListSerializer,
+  BulkModelViewSet,
+  ListBulkCreateUpdateDestroyAPIView,
+)
+
 # Variable initialization
 User = get_user_model()
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
@@ -55,7 +61,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = []
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -66,16 +72,15 @@ class GroupViewSet(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
-class DataEntryViewSet(viewsets.ModelViewSet):
+class DataEntryViewSet(BulkModelViewSet):
     """
     API endpoint that allows data entries to be created.
     """
     queryset = DataEntry.objects.all()
     serializer_class = DataEntrySerializer
-    # TODO: Apply permissions
+    # NOTE: We skip authentication for posting new data entries.
     permission_classes = []
-    http_method_names = ['post', 'get']
+    http_method_names = ['post']
 
 ##################################################
 # Authentication API endpoints

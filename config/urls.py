@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 from api import views
+from rest_framework_bulk.routes import BulkRouter
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -25,13 +26,17 @@ from rest_framework_simplejwt.views import (
 
 
 router = routers.DefaultRouter()
+bulk_router = BulkRouter()
+
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
-router.register(r'data_entries', views.DataEntryViewSet)
+bulk_router.register(r'data_entries', views.DataEntryViewSet)
+# bulk_router.register(r'data_entries', views.BulkDataEntryViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/', include(bulk_router.urls)),
     path('api/send_magic_link', views.send_magic_link, name='send_magic_link'),
     path('api/confirm_magic_link', views.confirm_magic_link, name='confirm_magic_link'),
     path('api/send_access_code', views.send_access_code, name='send_access_code'),
