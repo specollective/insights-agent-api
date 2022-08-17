@@ -10,7 +10,6 @@ from rest_framework import status
 from api.models import StudyParticipant, DataEntry, Survey
 from api.services import SmsClient, OtpClient
 from rest_framework_simplejwt.tokens import RefreshToken
-from test.support import EnvironmentVarGuard
 
 
 @mock.patch.dict(os.environ, {"TWILIO_ACCOUNT_SID": "FAKE_TWILIO_ACCOUNT_SID"})

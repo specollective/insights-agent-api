@@ -20,12 +20,12 @@ class SurveyAPI(TestCase):
 
         client = Client()
         example_data = {
-           'age': 30,
-           'token': 'example-token',
-           'education_level': 'college',
-           'gender': 'female',
+           'computer_use': 'school',
+           'technology_compentency_level': '1',
+           'internet_access': 'dial-up',
            'hispanic_origin': True,
-           'marital_status': 'married',
+           'household_members': '1',
+           'household_computers': '1',
         }
         user = User.objects.create(username='example-user-name')
         refresh = RefreshToken.for_user(user)
@@ -40,17 +40,17 @@ class SurveyAPI(TestCase):
 
         response_data = response.json()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response_data['education_level'], 'college')
+        self.assertEqual(response_data['technology_compentency_level'], 1)
 
     def test_data_survey_post_request_failure(self):
         client = Client()
         example_data = {
-           'age': 30,
-           'token': 'example-token',
-           'education_level': None,
-           'gender': 'female',
+           'computer_use': None,
+           'technology_compentency_level': '1',
+           'internet_access': 'dial-up',
            'hispanic_origin': True,
-           'marital_status': 'married',
+           'household_members': '1',
+           'household_computers': '1',
         }
         user = User.objects.create(username='example-user-name')
         refresh = RefreshToken.for_user(user)
