@@ -7,3 +7,4 @@ cert.pem
 key.pem
 DEV_NOTES
 docs/**/*
+data/**/*
