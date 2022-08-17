@@ -25,11 +25,11 @@ class StudyParticipantAdmin(admin.ModelAdmin):
 class SurveyAdmin(admin.ModelAdmin):
     list_display = (
       "identifier",
-      "age",
-      "gender",
-      "education_level",
-      "marital_status",
-      "hispanic_origin",
+      "computer_use",
+      "household_computers",
+      "household_members",
+      "technology_compentency_level",
+      "internet_access",
     )
 
     def identifier(self, obj):

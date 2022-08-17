@@ -26,12 +26,13 @@ class StudyParticipant(models.Model):
 class Survey(models.Model):
     """Represents an indiviudal survey filled out by study participant."""
 
-    age = models.PositiveIntegerField()
-    education_level = models.CharField(max_length=100)
-    gender = models.CharField(max_length=100)
-    hispanic_origin = models.BooleanField(default=False)
-    marital_status = models.CharField(max_length=100)
     token = models.CharField(max_length=200, blank=False, unique=True)
+    hispanic_origin = models.BooleanField(default=False, null=True)
+    computer_use = models.TextField(blank=False, null=True)
+    household_computers = models.IntegerField(blank=False, null=True)
+    household_members = models.IntegerField(blank=False, null=True)
+    internet_access = models.TextField(blank=False, null=True)
+    technology_compentency_level = models.IntegerField(blank=False, null=True)
 
     def __str__(self):
         return self.token[-20:]

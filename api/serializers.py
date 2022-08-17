@@ -21,10 +21,12 @@ class SurveySerializer(serializers.HyperlinkedModelSerializer):
         model = Survey
         fields = [
             'token',
-            'age',
-            'gender',
+            'computer_use',
+            'household_members',
+            'household_computers',
             'hispanic_origin',
-            'education_level',
+            'technology_compentency_level',
+            'internet_access',
         ]
 
 

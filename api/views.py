@@ -285,11 +285,12 @@ def surveys(request):
     data = loadJson(request.body.decode("utf-8"))
     survey = Survey(
       token=request.user.username,
-      age=data['age'],
-      gender=data['gender'],
-      marital_status=data['marital_status'],
+      computer_use=data['computer_use'],
       hispanic_origin=data['hispanic_origin'] == 'true',
-      education_level=data['education_level'],
+      household_computers=data['household_computers'],
+      household_members=data['household_members'],
+      internet_access=data['internet_access'],
+      technology_compentency_level=data['technology_compentency_level'],
     )
 
     try:
