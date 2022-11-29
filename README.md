@@ -57,66 +57,61 @@ cd insights-agent-api
 └── requirements.txt
 ```
 
-# Development Environment (localhost)
+# Setting up Development Environment (localhost)
 
-1. Set up environment variables
-```Shell
-cp .env.development .env
-```
+### 1. Set environment variables
+  ```Shell
+  cp .env.development .env
+  ```
 
-2. Set up python environment
-```Shell
-python3 -m venv python-env
-```
+### 2. Build the docker images
+  ```Shell
+  docker compose build
+  ```
 
-3. Active python environment
-```Shell
-source python-env/bin/activate
-```
+### 3. Start the database
+  ```Shell
+  docker compose up db
+  ```
 
-4. Install dependencies
-```Shell
-pip install -r requirements.txt
-```
+### 4. Start the webserver
+  ```Shell
+  docker compose up web
+  ```
 
-5. Migrate database
-```Shell
-python manage.py migrate
-```
+### 5. Create admin user
+  ```Shell
+  docker compose run web python manage.py createsuperuser --email example@example.com --username admin
+  ```
 
-7. Creating an admin user
-```Shell
-python manage.py createsuperuser --email example@example.com --username admin
-```
+**Note:** In the future you can  run `docker compose up` to start both db and web server. It is only necessary to run them separately the first time.
 
-8. Running development server
-```Shell
-python manage.py runserver
-```
 
-9. Running tests
-```Shell
-python manage.py test
-```
+### 6. Running Tests
+The application currently uses Django's out-of-the-box testing environment. You can run all tests using the manage.py comment.
+  
+  ```Shell
+  docker compose up python manage.py test
+  ```
 
-10. Setting breakpoints for debugging
-```Python
-# Import ipdb at top of file
-import ipdb
-# Set interactive debugger in the code your
-ipdb.set_trace()
-```
+### 7. Setting breakpoints for debugging
+  ```Python
+  # Import ipdb at top of file
+  import ipdb
+  # Set interactive debugger in the code your
+  ipdb.set_trace()
+  ```
 
-11. Test basic SMS API
-```
-curl -X POST https://insights-agent-api.specollective.org/api/resend_access_code \
-     -d '{"phone_number": "+18888888888", "name": "John Shmo"}' \
-     -H 'Content-Type: application/json'
-```
+### 8. Test basic SMS API
+  ```Shell
+  curl -X POST https://insights-agent-api.specollective.org/api/resend_access_code \
+      -d '{"phone_number": "+18888888888", "name": "John Shmo"}' \
+      -H 'Content-Type: application/json'
+  ```
 
 **Note:** Right now, we are using a trial Twilio phone number for testing. Your phone number needs to be added to the verified caller list to be able to test sending messages to your phone number.
 
-12. Local SSL setup
+### 9. Local SSL setup
 
 https://timonweb.com/django/https-django-development-server-ssl-certificate/
 
@@ -131,7 +126,7 @@ https://stackoverflow.com/questions/58715204/how-to-change-the-domain-name-on-a-
 A practical, Complete Tutorial on HTTP cookies
 https://www.valentinog.com/blog/cookies
 
-
+```Shell
 curl -X POST http://localhost:8000/api/send_access_code \
   -d '{"phone_number": "+18888888888"}' \
   -H 'Content-Type: application/json'
@@ -139,3 +134,4 @@ curl -X POST http://localhost:8000/api/send_access_code \
 curl -X POST http://localhost:8000/api/confirm_access_code \
   -d '{"access_code": "366997"}' \
   -H 'Content-Type: application/json'
+```
