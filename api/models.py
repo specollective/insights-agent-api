@@ -40,6 +40,8 @@ class Survey(models.Model):
 class SurveyResult(models.Model):
     """Represents an indiviudal survey result filled out by study participant."""
 
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE, blank=False, null=True)
+    participant = models.ForeignKey(StudyParticipant, on_delete=models.CASCADE, blank=False, null=True)    
     token = models.CharField(max_length=200, blank=False, unique=True)
     hispanic_origin = models.BooleanField(default=False, null=True)
     computer_use = models.TextField(blank=False, null=True)
@@ -81,3 +83,85 @@ def create_study_participant(sender, instance, created, **kwargs):
 # @receiver(post_save, sender=User)
 # def save_study_participant(sender, instance, **kwargs):
 #     instance.studyparticipant.save()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# class SurveyResult(models.Model):
+#     """Represents an indiviudal survey filled out by study participant."""
+
+#     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+#     participant = models.ForeignKey(StudyParticipant, on_delete=models.CASCADE)
+    
+#     token = models.CharField(max_length=200, blank=False, unique=True)
+#     hispanic_origin = models.BooleanField(default=False, null=True)
+#     computer_use = models.TextField(blank=False, null=True)
+#     household_computers = models.IntegerField(blank=False, null=True)
+#     household_members = models.IntegerField(blank=False, null=True)
+#     internet_access = models.TextField(blank=False, null=True)
+#     technology_compentency_level = models.IntegerField(blank=False, null=True)
+
+#     def __str__(self):
+#         return self.token[-20:]
+
+
+
+# class DataEntry(models.Model):
+#     """Represents a single activity data point."""
+
+#     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+
+#     application_name = models.CharField(max_length=200)
+#     tab_name = models.CharField(max_length=200, blank=True)
+#     url = models.URLField(max_length=200, blank=True)
+#     timestamp = models.DateTimeField()
+#     token = models.CharField(max_length=200, blank=True)
+#     internet_connection = models.CharField(max_length=200, blank=True)
+
+#     class Meta:
+#         verbose_name_plural = "Data Entries"
+
+
+# @receiver(post_save, sender=User)
+# def create_study_participant(sender, instance, created, **kwargs):
+#     if created:
+#         StudyParticipant.objects.create(user=instance)
+
+
+# # @receiver(post_save, sender=User)
+# # def save_study_participant(sender, instance, **kwargs):
+# #     instance.studyparticipant.save()
