@@ -1,6 +1,7 @@
+import random
+import string
 from phonenumber_field.modelfields import PhoneNumberField
 from uuid import uuid4
-from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
@@ -22,8 +23,20 @@ class StudyParticipant(models.Model):
         default=uuid4
     )
 
+class Survey(models.Model):
+    """Represents an indiviudal survey"""
 
-    
+    table_key = models.CharField(
+        unique=True,
+        max_length=63, 
+        default=uuid4,
+        editable=False,
+        )
+
+    participants = models.ManyToManyField(StudyParticipant)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
 class SurveyResult(models.Model):
     """Represents an indiviudal survey result filled out by study participant."""
 
@@ -52,6 +65,12 @@ class DataEntry(models.Model):
     class Meta:
         verbose_name_plural = "Data Entries"
 
+
+@receiver(post_save, sender=Survey)
+def set_uniq_table_key(sender, instance, created, **kwargs):
+    # The table key must be updated to be an unique alphanumeric key to be used as a postgres table name in the data injestion service.
+    if created:
+        instance.update(key=f"_{instance.id}_{''.join(random.choices(string.ascii_uppercase + string.digits, k=16))}")
 
 @receiver(post_save, sender=User)
 def create_study_participant(sender, instance, created, **kwargs):
