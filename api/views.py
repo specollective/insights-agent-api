@@ -20,14 +20,13 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # Application dependencies
-from api.models import StudyParticipant, Survey, DataEntry
-from api.serializers import UserSerializer, GroupSerializer, SurveySerializer
+from api.models import StudyParticipant, SurveyResult, DataEntry
 from api.services import SmsClient
 from api.services import SmsClient, OtpClient
 from api.serializers import (
     DataEntrySerializer,
     GroupSerializer,
-    SurveySerializer,
+    SurveyResultSerializer,
     UserSerializer,
 )
 from api.utils import (
@@ -276,6 +275,7 @@ def logout(request):
 
 
 # POST /api/surveys
+# TODO: change to survey results?
 @api_view(['POST'])
 def surveys(request):
     """
@@ -283,7 +283,7 @@ def surveys(request):
     """
     error_messages = None
     data = loadJson(request.body.decode("utf-8"))
-    survey = Survey(
+    survey_result = SurveyResult(
       token=request.user.username,
       computer_use=data['computer_use'],
       hispanic_origin=data['hispanic_origin'] == 'true',
@@ -294,13 +294,13 @@ def surveys(request):
     )
 
     try:
-        survey.full_clean()
+        survey_result.full_clean()
     except ValidationError as e:
         error_messages = e.message_dict
         return Response(error_messages, status=400)
 
-    survey.save()
-    serializer = SurveySerializer(survey)
+    survey_result.save()
+    serializer = SurveyResultSerializer(survey_result)
 
     # TODO : Refactor to use rest framework
     # serializer = SurveySerializer(data=request.data)

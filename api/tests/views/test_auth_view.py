@@ -1,15 +1,11 @@
 import os
-import sys
-import uuid
 from json import dumps as jsonDump
 from unittest import mock
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 from django.test import TestCase, Client
 from rest_framework import status
-from api.models import StudyParticipant, DataEntry, Survey
+from api.models import StudyParticipant
 from api.services import SmsClient, OtpClient
-from rest_framework_simplejwt.tokens import RefreshToken
 
 
 @mock.patch.dict(os.environ, {"TWILIO_ACCOUNT_SID": "FAKE_TWILIO_ACCOUNT_SID"})

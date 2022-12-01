@@ -1,7 +1,6 @@
 from json import dumps as jsonDump
 from django.test import TestCase, Client
 from rest_framework import status
-from api.models import StudyParticipant, DataEntry, Survey
 
 
 class DataEntryAPI(TestCase):

@@ -23,8 +23,9 @@ class StudyParticipant(models.Model):
     )
 
 
-class Survey(models.Model):
-    """Represents an indiviudal survey filled out by study participant."""
+    
+class SurveyResult(models.Model):
+    """Represents an indiviudal survey result filled out by study participant."""
 
     token = models.CharField(max_length=200, blank=False, unique=True)
     hispanic_origin = models.BooleanField(default=False, null=True)
