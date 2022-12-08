@@ -7,25 +7,25 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 # Django REST Framework dependencies
-from rest_framework import permissions
-from rest_framework import status
-from rest_framework import viewsets
+from rest_framework import permissions, generics, status, viewsets
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+
 # Application dependencies
-from api.models import StudyParticipant, SurveyResult, DataEntry
+from api.models import StudyParticipant, Survey, SurveyResult, DataEntry
 from api.services import SmsClient
 from api.services import SmsClient, OtpClient
 from api.serializers import (
     DataEntrySerializer,
     GroupSerializer,
+    SurveySerializer,
     SurveyResultSerializer,
     UserSerializer,
 )
@@ -80,6 +80,19 @@ class DataEntryViewSet(BulkModelViewSet):
     # NOTE: We skip authentication for posting new data entries.
     permission_classes = []
     http_method_names = ['post']
+
+class ListSurvey(generics.ListCreateAPIView):
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+    queryset = Survey.objects.all()
+    serializer_class = SurveySerializer
+    permission_classes = [ permissions.IsAuthenticatedOrReadOnly]
+
+
+class DetailSurvey(generics.RetrieveUpdateDestroyAPIView):
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+    queryset = Survey.objects.all()
+    serializer_class = SurveySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 ##################################################
 # Authentication API endpoints
@@ -275,7 +288,6 @@ def logout(request):
 
 
 # POST /api/survey_results
-# TODO: change to survey results?
 @api_view(['POST'])
 def survey_results(request):
     """

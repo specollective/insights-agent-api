@@ -14,7 +14,6 @@ class SurveyResultAPI(TestCase):
         self.participant = self.user.studyparticipant
         self.survey = Survey.objects.create()
 
-    # TODO: Add assertion for HTTP only auth
     def test_data_survey_post_request(self):
         self.assertEqual(SurveyResult.objects.count(), 0)
 
@@ -36,8 +35,6 @@ class SurveyResultAPI(TestCase):
             content_type='application/json',
             HTTP_AUTHORIZATION=f"Bearer {str(refresh.access_token)}"
         )
-
-        print(response.data)
 
         self.assertEqual(SurveyResult.objects.count(), 1)
 

@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User, Group
-from api.models import SurveyResult, DataEntry
+from api.models import Survey, SurveyResult, DataEntry
 from rest_framework import serializers
 from rest_framework_bulk import BulkSerializerMixin, BulkListSerializer
 
@@ -16,11 +16,15 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'name']
 
 
+class SurveySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Survey
+        fields = '__all__'
+
 class SurveyResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = SurveyResult
         fields = '__all__'
-
 
 class DataEntrySerializer(BulkSerializerMixin, serializers.ModelSerializer):
     class Meta:
