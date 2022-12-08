@@ -44,7 +44,8 @@ urlpatterns = [
     path('api/confirm_magic_link', views.confirm_magic_link, name='confirm_magic_link'),
     path('api/send_access_code', views.send_access_code, name='send_access_code'),
     path('api/confirm_access_code', views.confirm_access_code, name='confirm_access_code'),
-    path('api/surveys', views.surveys, name='surveys'), # is this already being used? change to survey_results?
+    # path('api/surveys', views.surveys, name='surveys'),
+    path('api/survey_results', views.survey_results, name='survey_results'),
     path('api/logout', views.logout, name='logout'),
     path('api/current_user', views.current_user, name='current_user'),
     path('', include('pages.urls')),

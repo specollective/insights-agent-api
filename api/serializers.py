@@ -16,18 +16,10 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'name']
 
 
-class SurveyResultSerializer(serializers.HyperlinkedModelSerializer):
+class SurveyResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = SurveyResult
-        fields = [
-            'token',
-            'computer_use',
-            'household_members',
-            'household_computers',
-            'hispanic_origin',
-            'technology_compentency_level',
-            'internet_access',
-        ]
+        fields = '__all__'
 
 
 class DataEntrySerializer(BulkSerializerMixin, serializers.ModelSerializer):

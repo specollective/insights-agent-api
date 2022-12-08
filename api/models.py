@@ -73,7 +73,8 @@ class DataEntry(models.Model):
 def set_uniq_table_key(sender, instance, created, **kwargs):
     # The table key must be updated to be an unique alphanumeric key to be used as a postgres table name in the data injestion service.
     if created:
-        instance.update(key=f"_{instance.id}_{''.join(random.choices(string.ascii_uppercase + string.digits, k=16))}")
+        instance.key = f"_{instance.id}_{''.join(random.choices(string.ascii_uppercase + string.digits, k=16))}"
+        instance.save()
 
 @receiver(post_save, sender=User)
 def create_study_participant(sender, instance, created, **kwargs):
