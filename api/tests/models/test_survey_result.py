@@ -8,12 +8,10 @@ class SurveyResultModelTest(TestCase):
     """
     def setUp(self):
         user = User.objects.create(username='example username')
-        self.participant = user.studyparticipant
         self.survey = Survey.objects.create()
 
     def test_survey_result_attributes(self):
         survey_result = SurveyResult.objects.create(
-            participant=self.participant,
             survey=self.survey,     
             token='token123',
             hispanic_origin=True,
@@ -24,7 +22,6 @@ class SurveyResultModelTest(TestCase):
             technology_compentency_level=3
         )
 
-        self.assertEqual(survey_result.participant, self.participant)
         self.assertEqual(survey_result.survey, self.survey)
         self.assertEqual(survey_result.token, 'token123')
         self.assertEqual(survey_result.hispanic_origin, True)

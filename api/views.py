@@ -296,9 +296,7 @@ def survey_results(request):
     error_messages = None
     data = loadJson(request.body.decode("utf-8"))
     survey_result = SurveyResult(
-      token=request.user.username,
       survey_id=data['survey_id'],
-      participant_id=data['participant_id'],
       computer_use=data['computer_use'],
       hispanic_origin=data['hispanic_origin'] == 'true',
       household_computers=data['household_computers'],

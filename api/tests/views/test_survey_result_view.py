@@ -11,7 +11,6 @@ class SurveyResultAPI(TestCase):
 
     def setUp(self):
         self.user = User.objects.create(username='example-user-name')
-        self.participant = self.user.studyparticipant
         self.survey = Survey.objects.create()
 
     def test_data_survey_post_request(self):
@@ -19,7 +18,6 @@ class SurveyResultAPI(TestCase):
 
         client = Client()
         example_data = {
-            'participant_id': self.participant.id,
             'survey_id': self.survey.id,
             'computer_use': 'school',
             'technology_compentency_level': '1',
@@ -41,13 +39,11 @@ class SurveyResultAPI(TestCase):
         response_data = response.json()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response_data['technology_compentency_level'], 1)
-        self.assertEqual(response_data['participant'], self.participant.id)
         self.assertEqual(response_data['survey'], self.survey.id)
 
     def test_data_survey_post_request_failure(self):
         client = Client()
         example_data = {
-            'participant_id': self.participant.id,
             'survey_id': self.survey.id,
             'computer_use': None,
             'technology_compentency_level': '1',
