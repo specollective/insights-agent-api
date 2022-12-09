@@ -89,7 +89,6 @@ class AuthenticationAPITest(TestCase):
         self.assertTrue(json['access_token'] in cookies)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json['message'], 'success')
-        self.assertEqual(len(json['refresh_token']), 231)
         user.studyparticipant.refresh_from_db()
         self.assertEqual(user.studyparticipant.confirmed_phone_number, True)
 

@@ -41,7 +41,7 @@ class SurveyResult(models.Model):
     """Represents an indiviudal survey result filled out by study participant."""
 
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE, blank=False, null=True)
-    token = models.CharField(max_length=200, blank=False, default=uuid4, unique=True)
+    token = models.CharField(max_length=200, blank=False, unique=True)
     hispanic_origin = models.BooleanField(default=False, null=True)
     computer_use = models.TextField(blank=False, null=True)
     household_computers = models.IntegerField(blank=False, null=True)
@@ -50,7 +50,7 @@ class SurveyResult(models.Model):
     technology_compentency_level = models.IntegerField(blank=False, null=True)
 
     def __str__(self):
-        return self.token.hex[-20:]
+        return self.token[-20:]
 
 
 class DataEntry(models.Model):

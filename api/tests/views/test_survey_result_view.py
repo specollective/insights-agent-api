@@ -18,6 +18,7 @@ class SurveyResultAPI(TestCase):
 
         client = Client()
         example_data = {
+            'token': 'token123',
             'survey_id': self.survey.id,
             'computer_use': 'school',
             'technology_compentency_level': '1',
@@ -44,6 +45,7 @@ class SurveyResultAPI(TestCase):
     def test_data_survey_post_request_failure(self):
         client = Client()
         example_data = {
+            'token': 'token123',
             'survey_id': self.survey.id,
             'computer_use': None,
             'technology_compentency_level': '1',

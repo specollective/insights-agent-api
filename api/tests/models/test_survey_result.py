@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.test import TestCase
 from api.models import Survey, SurveyResult
 
@@ -7,7 +6,6 @@ class SurveyResultModelTest(TestCase):
     Test module for SurveyResult model
     """
     def setUp(self):
-        user = User.objects.create(username='example username')
         self.survey = Survey.objects.create()
 
     def test_survey_result_attributes(self):
