@@ -1,65 +1,65 @@
-import os
-import uuid
-from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-from django.test import TestCase, Client
 from json import dumps as jsonDump
+from django.contrib.auth.models import User
+from django.test import TestCase, Client
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from unittest import mock
-from api.models import StudyParticipant, DataEntry, Survey
-from api.services import SmsClient, OtpClient
+from api.models import Survey
 
 
 class SurveyAPI(TestCase):
-    """Test module for Survey API"""
+    """ Test module for Survey API """
+    def setUp(self):
+        self.user = User.objects.create(username='example-user-name')
+        self.participant = self.user.studyparticipant
+        self.survey = Survey.objects.create()
+        Survey.objects.create()
+        Survey.objects.create()
 
-    # TODO: Add assertion for HTTP only auth
-    def test_data_survey_post_request(self):
-        self.assertEqual(Survey.objects.count(), 0)
-
+    def test_survey_get_request(self):
         client = Client()
-        example_data = {
-           'computer_use': 'school',
-           'technology_compentency_level': '1',
-           'internet_access': 'dial-up',
-           'hispanic_origin': True,
-           'household_members': '1',
-           'household_computers': '1',
-        }
-        user = User.objects.create(username='example-user-name')
-        refresh = RefreshToken.for_user(user)
+        response = client.get('/api/surveys')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = response.json()
+        self.assertEqual(len(response_data), 3)
+    
+    def test_survey_post_request(self):
+        self.assertEqual(Survey.objects.count(), 3)
+        client = Client()
+        refresh = RefreshToken.for_user(self.user)
         response = client.post(
             '/api/surveys',
-            jsonDump(example_data),
             content_type='application/json',
             HTTP_AUTHORIZATION=f"Bearer {str(refresh.access_token)}"
         )
-
-        self.assertEqual(Survey.objects.count(), 1)
-
         response_data = response.json()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response_data['technology_compentency_level'], 1)
+        id = response_data['id']
+        self.assertIn(f"_{id}_", Survey.objects.get(pk=id).table_key)
 
-    def test_data_survey_post_request_failure(self):
+    def test_survey_show_request(self):
         client = Client()
-        example_data = {
-           'computer_use': None,
-           'technology_compentency_level': '1',
-           'internet_access': 'dial-up',
-           'hispanic_origin': True,
-           'household_members': '1',
-           'household_computers': '1',
+        response = client.get(f"/api/surveys/{self.survey.id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = response.json()
+        self.assertEqual(response_data['table_key'], Survey.objects.get(pk=self.survey.id).table_key)
+
+    def test_survey_update_request(self):
+        client = Client()
+        request_data = {
+            'participants': [self.participant.id],
         }
-        user = User.objects.create(username='example-user-name')
-        refresh = RefreshToken.for_user(user)
-        self.assertEqual(Survey.objects.count(), 0)
-        response = client.post(
-            '/api/surveys',
-            jsonDump(example_data),
-            content_type='application/json',
+
+        refresh = RefreshToken.for_user(self.user)
+        response = client.put(
+            f"/api/surveys/{self.survey.id}/",
+            jsonDump(request_data),
+            content_type="application/json",
             HTTP_AUTHORIZATION=f"Bearer {str(refresh.access_token)}"
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(Survey.objects.count(), 0)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = response.json()
+        self.assertEqual(response_data['participants'], [self.participant.id])
+

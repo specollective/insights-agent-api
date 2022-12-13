@@ -1,15 +1,11 @@
 import os
-import sys
-import uuid
 from json import dumps as jsonDump
 from unittest import mock
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 from django.test import TestCase, Client
 from rest_framework import status
-from api.models import StudyParticipant, DataEntry, Survey
+from api.models import StudyParticipant
 from api.services import SmsClient, OtpClient
-from rest_framework_simplejwt.tokens import RefreshToken
 
 
 @mock.patch.dict(os.environ, {"TWILIO_ACCOUNT_SID": "FAKE_TWILIO_ACCOUNT_SID"})
@@ -93,7 +89,6 @@ class AuthenticationAPITest(TestCase):
         self.assertTrue(json['access_token'] in cookies)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json['message'], 'success')
-        self.assertEqual(len(json['refresh_token']), 229)
         user.studyparticipant.refresh_from_db()
         self.assertEqual(user.studyparticipant.confirmed_phone_number, True)
 

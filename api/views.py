@@ -7,27 +7,26 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 # Django REST Framework dependencies
-from rest_framework import permissions
-from rest_framework import status
-from rest_framework import viewsets
+from rest_framework import permissions, generics, status, viewsets
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+
 # Application dependencies
-from api.models import StudyParticipant, Survey, DataEntry
-from api.serializers import UserSerializer, GroupSerializer, SurveySerializer
+from api.models import StudyParticipant, Survey, SurveyResult, DataEntry
 from api.services import SmsClient
 from api.services import SmsClient, OtpClient
 from api.serializers import (
     DataEntrySerializer,
     GroupSerializer,
     SurveySerializer,
+    SurveyResultSerializer,
     UserSerializer,
 )
 from api.utils import (
@@ -81,6 +80,19 @@ class DataEntryViewSet(BulkModelViewSet):
     # NOTE: We skip authentication for posting new data entries.
     permission_classes = []
     http_method_names = ['post']
+
+class ListSurvey(generics.ListCreateAPIView):
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+    queryset = Survey.objects.all()
+    serializer_class = SurveySerializer
+    permission_classes = [ permissions.IsAuthenticatedOrReadOnly]
+
+
+class DetailSurvey(generics.RetrieveUpdateDestroyAPIView):
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+    queryset = Survey.objects.all()
+    serializer_class = SurveySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 ##################################################
 # Authentication API endpoints
@@ -138,10 +150,12 @@ def confirm_magic_link(request):
 
         # 5. Generate JWT access tokens
         refresh = RefreshToken.for_user(study_participant.user)
+        survey_token = create_survey_token(study_participant.token)
         response_data = {
-          "message": "success",
-          "refresh_token": str(refresh),
-          "access_token": str(refresh.access_token),
+            "message": "success",
+            "refresh_token": str(refresh),
+            "access_token": str(refresh.access_token),
+            "survey_token": survey_token,
         }
 
         # 6. Create base JSON response
@@ -275,16 +289,18 @@ def logout(request):
     return response
 
 
-# POST /api/surveys
+# POST /api/survey_results
 @api_view(['POST'])
-def surveys(request):
+def survey_results(request):
     """
-    API endpoint to submit a survey
+    API endpoint to submit a survey result
     """
     error_messages = None
     data = loadJson(request.body.decode("utf-8"))
-    survey = Survey(
-      token=request.user.username,
+    
+    survey_result = SurveyResult(
+      token=data['token'],
+      survey_id=data['survey_id'],
       computer_use=data['computer_use'],
       hispanic_origin=data['hispanic_origin'] == 'true',
       household_computers=data['household_computers'],
@@ -294,13 +310,13 @@ def surveys(request):
     )
 
     try:
-        survey.full_clean()
+        survey_result.full_clean()
     except ValidationError as e:
         error_messages = e.message_dict
         return Response(error_messages, status=400)
 
-    survey.save()
-    serializer = SurveySerializer(survey)
+    survey_result.save()
+    serializer = SurveyResultSerializer(survey_result)
 
     # TODO : Refactor to use rest framework
     # serializer = SurveySerializer(data=request.data)

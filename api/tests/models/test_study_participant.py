@@ -1,14 +1,6 @@
-import os
-import uuid
-from json import dumps as dumpJson
-from unittest import mock
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django.test import TestCase, Client
-from rest_framework import status
-from api.models import StudyParticipant, DataEntry, Survey
-from api.services import SmsClient
 
 
 class StudyParticipantModelTest(TestCase):

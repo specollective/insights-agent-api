@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from api.models import StudyParticipant, Survey, DataEntry
+from api.models import StudyParticipant, SurveyResult, DataEntry
 
 
 class StudyParticipantInline(admin.StackedInline):
@@ -56,6 +56,6 @@ class UserAdmin(BaseUserAdmin):
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-admin.site.register(Survey, SurveyAdmin)
+admin.site.register(SurveyResult, SurveyAdmin)
 admin.site.register(DataEntry, DataEntryAdmin)
 admin.site.register(StudyParticipant, StudyParticipantAdmin)
