@@ -27,8 +27,6 @@ def is_phone_number_taken(phone_number):
 
 
 def create_study_participant(full_name, phone_number):
-    if StudyParticipant.objects.filter(phone_number=phone_number).exists():
-        return None
 
     User = get_user_model()
     user = User.objects.create(username=str(uuid.uuid4()))
