@@ -61,10 +61,9 @@ class AuthenticationAPITest(TestCase):
             content_type="application/json"
         )
         response_data = response.json()
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response_data['message'], 'invalid credentials')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response_data["error"], 'It looks like you have already signed up for this study with this phone number. Please follow the instructions given via text message. If you have not received a text message, please email tech4all@buildJUSTLY.org')
         self.assertEqual(StudyParticipant.objects.count(), 1)
-        mock_send_sms.assert_not_called
 
     def test_confirm_magic_link_post_request_success(self):
         otp_client = OtpClient()
