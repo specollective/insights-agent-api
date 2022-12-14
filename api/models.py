@@ -47,7 +47,11 @@ class SurveyResult(models.Model):
     household_computers = models.IntegerField(blank=False, null=True)
     household_members = models.IntegerField(blank=False, null=True)
     internet_access = models.TextField(blank=False, null=True)
-    technology_compentency_level = models.IntegerField(blank=False, null=True)
+    computer_difficulty_level = models.IntegerField(blank=False, null=True)
+    solve_computer_problems_level = models.IntegerField(blank=False, null=True)
+    handle_computer_problems_level = models.IntegerField(blank=False, null=True)
+    computer_acting_up_level = models.IntegerField(blank=False, null=True)
+    complex_computer_level = models.IntegerField(blank=False, null=True)
 
     def __str__(self):
         return self.token[-20:]

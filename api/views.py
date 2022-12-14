@@ -299,14 +299,18 @@ def survey_results(request):
     data = loadJson(request.body.decode("utf-8"))
     
     survey_result = SurveyResult(
-      token=data['token'],
-      survey_id=data['survey_id'],
-      computer_use=data['computer_use'],
-      hispanic_origin=data['hispanic_origin'] == 'true',
-      household_computers=data['household_computers'],
-      household_members=data['household_members'],
-      internet_access=data['internet_access'],
-      technology_compentency_level=data['technology_compentency_level'],
+        token=data['token'],
+        survey_id=data['survey_id'],
+        computer_use=data['computer_use'],
+        hispanic_origin=data['hispanic_origin'] == 'true',
+        household_computers=data['household_computers'],
+        household_members=data['household_members'],
+        internet_access=data['internet_access'],
+        computer_difficulty_level=data['computer_difficulty_level'],
+        solve_computer_problems_level=data['solve_computer_problems_level'],
+        handle_computer_problems_level=data['handle_computer_problems_level'],
+        computer_acting_up_level=data['computer_acting_up_level'],
+        complex_computer_level=data['complex_computer_level'],
     )
 
     try:

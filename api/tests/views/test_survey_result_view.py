@@ -21,11 +21,15 @@ class SurveyResultAPI(TestCase):
             'token': 'token123',
             'survey_id': self.survey.id,
             'computer_use': 'school',
-            'technology_compentency_level': '1',
             'internet_access': 'dial-up',
             'hispanic_origin': True,
             'household_members': '1',
             'household_computers': '1',
+            'computer_difficulty_level': '1',
+            'solve_computer_problems_level': '1',
+            'handle_computer_problems_level': '1',
+            'computer_acting_up_level': '1',
+            'complex_computer_level': '1',            
         }
         refresh = RefreshToken.for_user(self.user)
         response = client.post(
@@ -39,20 +43,28 @@ class SurveyResultAPI(TestCase):
 
         response_data = response.json()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response_data['technology_compentency_level'], 1)
         self.assertEqual(response_data['survey'], self.survey.id)
-
+        self.assertEqual(response_data['computer_difficulty_level'], 1)
+        self.assertEqual(response_data['solve_computer_problems_level'], 1)
+        self.assertEqual(response_data['handle_computer_problems_level'], 1)
+        self.assertEqual(response_data['computer_acting_up_level'], 1)
+        self.assertEqual(response_data['complex_computer_level'], 1)
+        
     def test_data_survey_post_request_failure(self):
         client = Client()
         example_data = {
             'token': 'token123',
             'survey_id': self.survey.id,
             'computer_use': None,
-            'technology_compentency_level': '1',
             'internet_access': 'dial-up',
             'hispanic_origin': True,
             'household_members': '1',
             'household_computers': '1',
+            'computer_difficulty_level': '1',
+            'solve_computer_problems_level': '1',
+            'handle_computer_problems_level': '1',
+            'computer_acting_up_level': '1',
+            'complex_computer_level': '1',
         }
         refresh = RefreshToken.for_user(self.user)
         self.assertEqual(SurveyResult.objects.count(), 0)
