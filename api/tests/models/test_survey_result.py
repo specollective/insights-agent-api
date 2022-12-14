@@ -17,7 +17,11 @@ class SurveyResultModelTest(TestCase):
             household_computers=4,
             household_members=5,
             internet_access='satellite',
-            technology_compentency_level=3
+            computer_difficulty_level=1,
+            solve_computer_problems_level=1,
+            handle_computer_problems_level=1,
+            computer_acting_up_level=1,
+            complex_computer_level=1,
         )
 
         self.assertEqual(survey_result.survey, self.survey)
@@ -27,4 +31,8 @@ class SurveyResultModelTest(TestCase):
         self.assertEqual(survey_result.household_computers, 4)
         self.assertEqual(survey_result.household_members, 5)
         self.assertEqual(survey_result.internet_access, 'satellite')
-        self.assertEqual(survey_result.technology_compentency_level, 3)
+        self.assertEqual(survey_result.computer_difficulty_level, 1)
+        self.assertEqual(survey_result.solve_computer_problems_level, 1)
+        self.assertEqual(survey_result.handle_computer_problems_level, 1)
+        self.assertEqual(survey_result.computer_acting_up_level, 1)
+        self.assertEqual(survey_result.complex_computer_level, 1)

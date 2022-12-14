@@ -22,13 +22,17 @@ class StudyParticipantAdmin(admin.ModelAdmin):
         return obj.token[-10:]
 
 
-class SurveyAdmin(admin.ModelAdmin):
+class SurveyResultAdmin(admin.ModelAdmin):
     list_display = (
       "identifier",
       "computer_use",
       "household_computers",
       "household_members",
-      "technology_compentency_level",
+      "computer_difficulty_level",
+      "solve_computer_problems_level",
+      "handle_computer_problems_level",
+      "computer_acting_up_level",
+      "complex_computer_level",
       "internet_access",
     )
 
@@ -56,6 +60,6 @@ class UserAdmin(BaseUserAdmin):
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-admin.site.register(SurveyResult, SurveyAdmin)
+admin.site.register(SurveyResult, SurveyResultAdmin)
 admin.site.register(DataEntry, DataEntryAdmin)
 admin.site.register(StudyParticipant, StudyParticipantAdmin)
