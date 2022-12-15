@@ -40,6 +40,7 @@ class SurveyResultAPI(TestCase):
         )
 
         self.assertEqual(SurveyResult.objects.count(), 1)
+        self.assertEqual(self.survey.participants.count(), 1)
 
         response_data = response.json()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -76,3 +77,5 @@ class SurveyResultAPI(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(SurveyResult.objects.count(), 0)
+        self.assertEqual(self.survey.participants.count(), 0)
+

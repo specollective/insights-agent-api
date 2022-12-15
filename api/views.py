@@ -1,9 +1,8 @@
 # Python standard library dependencies
 import os
-import uuid
 from json import loads as loadJson
 # Django dependencies
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
@@ -147,6 +146,7 @@ def confirm_magic_link(request):
         # 4. Set confirmed phone number to true and save record.
         study_participant.confirmed_phone_number = True
         study_participant.save()
+        login(request, study_participant.user)
 
         # 5. Generate JWT access tokens
         refresh = RefreshToken.for_user(study_participant.user)
@@ -297,7 +297,7 @@ def survey_results(request):
     """
     error_messages = None
     data = loadJson(request.body.decode("utf-8"))
-    
+
     survey_result = SurveyResult(
         token=data['token'],
         survey_id=data['survey_id'],
@@ -315,6 +315,9 @@ def survey_results(request):
 
     try:
         survey_result.full_clean()
+        survey = Survey.objects.get(id=data['survey_id'])
+        participant = StudyParticipant.objects.get(user=request.user)
+        survey.participants.add(participant)
     except ValidationError as e:
         error_messages = e.message_dict
         return Response(error_messages, status=400)
