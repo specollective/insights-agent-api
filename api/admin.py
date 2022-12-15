@@ -34,6 +34,7 @@ class SurveyResultAdmin(admin.ModelAdmin):
       "computer_acting_up_level",
       "complex_computer_level",
       "internet_access",
+      "race"
     )
 
     def identifier(self, obj):
