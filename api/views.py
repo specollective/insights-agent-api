@@ -311,6 +311,7 @@ def survey_results(request):
         handle_computer_problems_level=data['handle_computer_problems_level'],
         computer_acting_up_level=data['computer_acting_up_level'],
         complex_computer_level=data['complex_computer_level'],
+        race=data['race'],
     )
 
     try:

@@ -29,7 +29,8 @@ class SurveyResultAPI(TestCase):
             'solve_computer_problems_level': '1',
             'handle_computer_problems_level': '1',
             'computer_acting_up_level': '1',
-            'complex_computer_level': '1',            
+            'complex_computer_level': '1',
+            'race': 'race'            
         }
         refresh = RefreshToken.for_user(self.user)
         response = client.post(
@@ -50,6 +51,7 @@ class SurveyResultAPI(TestCase):
         self.assertEqual(response_data['handle_computer_problems_level'], 1)
         self.assertEqual(response_data['computer_acting_up_level'], 1)
         self.assertEqual(response_data['complex_computer_level'], 1)
+        self.assertEqual(response_data['race'], 'race')
         
     def test_data_survey_post_request_failure(self):
         client = Client()
@@ -66,6 +68,7 @@ class SurveyResultAPI(TestCase):
             'handle_computer_problems_level': '1',
             'computer_acting_up_level': '1',
             'complex_computer_level': '1',
+            'race': 'race'
         }
         refresh = RefreshToken.for_user(self.user)
         self.assertEqual(SurveyResult.objects.count(), 0)

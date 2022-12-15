@@ -52,6 +52,8 @@ class SurveyResult(models.Model):
     handle_computer_problems_level = models.IntegerField(blank=False, null=True)
     computer_acting_up_level = models.IntegerField(blank=False, null=True)
     complex_computer_level = models.IntegerField(blank=False, null=True)
+    race = models.TextField(blank=False, null=True)
+
 
     def __str__(self):
         return self.token[-20:]

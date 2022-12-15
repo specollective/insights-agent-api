@@ -22,6 +22,7 @@ class SurveyResultModelTest(TestCase):
             handle_computer_problems_level=1,
             computer_acting_up_level=1,
             complex_computer_level=1,
+            race="race"
         )
 
         self.assertEqual(survey_result.survey, self.survey)
@@ -36,3 +37,4 @@ class SurveyResultModelTest(TestCase):
         self.assertEqual(survey_result.handle_computer_problems_level, 1)
         self.assertEqual(survey_result.computer_acting_up_level, 1)
         self.assertEqual(survey_result.complex_computer_level, 1)
+        self.assertEqual(survey_result.race, 'race')
