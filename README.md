@@ -91,7 +91,7 @@ cd insights-agent-api
 The application currently uses Django's out-of-the-box testing environment. You can run all tests using the manage.py comment.
   
   ```Shell
-  docker compose up python manage.py test
+  docker compose run web python manage.py test
   ```
 
 ### 7. Setting breakpoints for debugging
