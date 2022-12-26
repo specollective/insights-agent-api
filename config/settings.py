@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'phonenumber_field',
     'pages.apps.PagesConfig',
-    'projects.apps.ProjectsConfig',
     'corsheaders',
     'sslserver',
     'api',
