@@ -158,12 +158,10 @@ def confirm_magic_link(request):
 
         # 5. Generate JWT access tokens
         refresh = RefreshToken.for_user(study_participant.user)
-        survey_token = create_survey_token(study_participant.token)
         response_data = {
             "message": "success",
             "refresh_token": str(refresh),
             "access_token": str(refresh.access_token),
-            "survey_token": survey_token,
         }
 
         # 6. Create base JSON response
@@ -232,7 +230,9 @@ def send_access_code(request):
 
         return response
 
-
+# Handles confirmation of access code for a study participant login
+# from the desktop app.
+#
 # POST /api/confirm_access_code
 @csrf_exempt
 def confirm_access_code(request):
@@ -256,10 +256,18 @@ def confirm_access_code(request):
         # 5. Create survey token
         survey_token = create_survey_token(study_participant.token)
 
+        surveys = Survey.objects.filter(
+            participants__id=study_participant.id,
+        )
+
+        # TODO: Handle multiple surveys
+        survey = surveys[0]
+
         # 6. Build base JSON response object.
         response = JsonResponse({
           "message": "success",
-          "survey_token": survey_token,
+          "survey_id": survey.id,
+          "table_key": survey.table_key,
         })
 
         # 7. Set headers for CORS
@@ -274,18 +282,6 @@ def confirm_access_code(request):
         return JsonResponse({"message": "invalid access code"}, status=400)
 
 
-# GET /api/current_user
-@api_view(['GET'])
-def current_user(request):
-    """
-    API endpoint to fetch a current user
-    """
-    serializer = UserSerializer(request.user, context={"request": request})
-    if request.user.username == "":
-        return Response({"message": "error"}, status=400)
-    return Response(serializer.data)
-
-
 # DELETE /api/logout
 @api_view(['DELETE'])
 def logout(request):
@@ -297,6 +293,23 @@ def logout(request):
     return response
 
 
+# GET /api/current_user
+@api_view(['GET'])
+def current_user(request):
+    """
+    API endpoint to fetch a current user
+    """
+    serializer = UserSerializer(
+        request.user,
+        context={"request": request}
+    )
+
+    if request.user.username == "":
+        return Response({"message": "error"}, status=400)
+
+    return Response(serializer.data)
+
+
 # POST /api/survey_results
 @api_view(['POST'])
 def survey_results(request):
@@ -306,9 +319,17 @@ def survey_results(request):
     error_messages = None
     data = loadJson(request.body.decode("utf-8"))
 
+    try:
+        survey = Survey.objects.get(slug=data['survey_id'])
+        participant = StudyParticipant.objects.get(user=request.user)
+        survey_token = create_survey_token(participant.token)
+    except ValidationError as e:
+        error_messages = e.message_dict
+        return Response(error_messages, status=400)
+
     survey_result = SurveyResult(
-        token=data['token'],
-        survey_id=data['survey_id'],
+        token=survey_token,
+        survey_id=survey.id,
         computer_use=data['computer_use'],
         hispanic_origin=data['hispanic_origin'] == 'true',
         household_computers=data['household_computers'],
@@ -324,22 +345,12 @@ def survey_results(request):
 
     try:
         survey_result.full_clean()
-        survey = Survey.objects.get(id=data['survey_id'])
-        participant = StudyParticipant.objects.get(user=request.user)
         survey.participants.add(participant)
+        survey_result.save()
     except ValidationError as e:
         error_messages = e.message_dict
         return Response(error_messages, status=400)
 
-    survey_result.save()
     serializer = SurveyResultSerializer(survey_result)
-
-    # TODO : Refactor to use rest framework
-    # serializer = SurveySerializer(data=request.data)
-    # if serializer.is_valid():
-    #   serializer.save()
-    #   return Response(serializer.data, status=status.HTTP_201_CREATED)
-    # else
-    #   return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'phonenumber_field',
     'pages.apps.PagesConfig',
-    'projects.apps.ProjectsConfig',
     'corsheaders',
     'sslserver',
     'api',
@@ -98,6 +97,9 @@ if len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
                 'PASSWORD': os.environ.get('DB_PASSWORD'),
                 'HOST': os.environ.get('DB_HOST'),
                 'PORT': os.environ.get('DB_PORT'),
+                'TEST': {
+                  'NAME': 'test_db',
+                },
             }
         }
     else:

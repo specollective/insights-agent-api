@@ -11,7 +11,10 @@ class SurveyResultAPI(TestCase):
 
     def setUp(self):
         self.user = User.objects.create(username='example-user-name')
-        self.survey = Survey.objects.create()
+        self.survey = Survey.objects.create(
+            slug='example-slug',
+            name='example-name',
+        )
 
     def test_data_survey_post_request(self):
         self.assertEqual(SurveyResult.objects.count(), 0)
@@ -19,7 +22,7 @@ class SurveyResultAPI(TestCase):
         client = Client()
         example_data = {
             'token': 'token123',
-            'survey_id': self.survey.id,
+            'survey_id': self.survey.slug,
             'computer_use': 'school',
             'internet_access': 'dial-up',
             'hispanic_origin': True,
@@ -57,7 +60,7 @@ class SurveyResultAPI(TestCase):
         client = Client()
         example_data = {
             'token': 'token123',
-            'survey_id': self.survey.id,
+            'survey_id': self.survey.slug,
             'computer_use': None,
             'internet_access': 'dial-up',
             'hispanic_origin': True,
