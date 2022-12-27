@@ -4,7 +4,7 @@ from unittest import mock
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from rest_framework import status
-from api.models import StudyParticipant
+from api.models import StudyParticipant, Survey
 from api.services import SmsClient, OtpClient
 
 
@@ -164,6 +164,13 @@ class AuthenticationAPITest(TestCase):
         user.studyparticipant.phone_number = '+18888888888'
         user.confirmed_phone_number = True
         user.studyparticipant.save()
+        survey = Survey.objects.create(
+            slug='example-slug',
+            name='example-name',
+        )
+        survey.participants.add(user.studyparticipant)
+        survey.save()
+
         response = client.post(
             '/api/confirm_access_code',
             jsonDump({
