@@ -23,7 +23,7 @@ class StudyParticipantAdmin(admin.ModelAdmin):
 
 
 class SurveyAdmin(admin.ModelAdmin):
-    fields = ('name', 'participants')
+    fields = ('name','slug', 'participants',)
 
     list_display = (
       "id",

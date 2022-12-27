@@ -230,7 +230,9 @@ def send_access_code(request):
 
         return response
 
-
+# Handles confirmation of access code for a study participant login
+# from the desktop app.
+#
 # POST /api/confirm_access_code
 @csrf_exempt
 def confirm_access_code(request):
@@ -254,10 +256,18 @@ def confirm_access_code(request):
         # 5. Create survey token
         survey_token = create_survey_token(study_participant.token)
 
+        surveys = Survey.objects.filter(
+            participants__id=study_participant.id,
+        )
+
+        # TODO: Handle multiple surveys
+        survey = surveys[0]
+
         # 6. Build base JSON response object.
         response = JsonResponse({
           "message": "success",
-          "survey_token": survey_token,
+          "survey_id": survey.id,
+          "table_key": survey.table_key,
         })
 
         # 7. Set headers for CORS
@@ -310,7 +320,7 @@ def survey_results(request):
     data = loadJson(request.body.decode("utf-8"))
 
     try:
-        survey = Survey.objects.get(id=data['survey_id'])
+        survey = Survey.objects.get(slug=data['survey_id'])
         participant = StudyParticipant.objects.get(user=request.user)
         survey_token = create_survey_token(participant.token)
     except ValidationError as e:

@@ -31,6 +31,7 @@ class Survey(models.Model):
     """Represents an individual survey"""
 
     name = models.CharField(max_length=400, blank=False, null=True)
+    slug = models.CharField(max_length=400, blank=False, null=True)
     table_key = models.CharField(
         unique=True,
         max_length=63, 
