@@ -158,12 +158,10 @@ def confirm_magic_link(request):
 
         # 5. Generate JWT access tokens
         refresh = RefreshToken.for_user(study_participant.user)
-        survey_token = create_survey_token(study_participant.token)
         response_data = {
             "message": "success",
             "refresh_token": str(refresh),
             "access_token": str(refresh.access_token),
-            "survey_token": survey_token,
         }
 
         # 6. Create base JSON response
