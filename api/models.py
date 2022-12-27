@@ -2,43 +2,49 @@ import random
 import string
 from phonenumber_field.modelfields import PhoneNumberField
 from uuid import uuid4
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
-class StudyParticipant(models.Model):
-    """Represents an indiviudal study participant."""
+User = get_user_model()
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    full_name = models.CharField(max_length=400)
-    approved = models.BooleanField(default=False)
-    confirmed_phone_number = models.BooleanField(default=False)
-    phone_number = PhoneNumberField(blank=False)
+
+class StudyParticipant(models.Model):
+    """Represents an individual study participant."""
+
     token = models.CharField(
         max_length=100,
         blank=True,
         unique=True,
         default=uuid4
     )
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=400)
+    approved = models.BooleanField(default=False)
+    confirmed_phone_number = models.BooleanField(default=False)
+    phone_number = PhoneNumberField(blank=False)
+
 
 class Survey(models.Model):
-    """Represents an indiviudal survey"""
+    """Represents an individual survey"""
 
+    name = models.CharField(max_length=400, blank=False, null=True)
     table_key = models.CharField(
         unique=True,
         max_length=63, 
         default=uuid4,
         editable=False,
-        )
+    )
 
     participants = models.ManyToManyField(StudyParticipant, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
 
+
 class SurveyResult(models.Model):
-    """Represents an indiviudal survey result filled out by study participant."""
+    """Represents an individual survey result filled out by study participant."""
 
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE, blank=False, null=True)
     token = models.CharField(max_length=200, blank=False, unique=True)

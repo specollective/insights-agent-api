@@ -7,13 +7,7 @@ from rest_framework_bulk import BulkSerializerMixin, BulkListSerializer
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'groups']
-
-
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Group
-        fields = ['url', 'name']
+        fields = ['id', 'username']
 
 
 class SurveySerializer(serializers.ModelSerializer):
@@ -21,10 +15,12 @@ class SurveySerializer(serializers.ModelSerializer):
         model = Survey
         fields = '__all__'
 
+
 class SurveyResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = SurveyResult
         fields = '__all__'
+
 
 class DataEntrySerializer(BulkSerializerMixin, serializers.ModelSerializer):
     class Meta:
@@ -38,3 +34,9 @@ class DataEntrySerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'internet_connection',
         ]
         list_serializer_class = BulkListSerializer
+
+
+class GroupSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Group
+        fields = ['url', 'name']

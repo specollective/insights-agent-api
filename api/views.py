@@ -274,18 +274,6 @@ def confirm_access_code(request):
         return JsonResponse({"message": "invalid access code"}, status=400)
 
 
-# GET /api/current_user
-@api_view(['GET'])
-def current_user(request):
-    """
-    API endpoint to fetch a current user
-    """
-    serializer = UserSerializer(request.user, context={"request": request})
-    if request.user.username == "":
-        return Response({"message": "error"}, status=400)
-    return Response(serializer.data)
-
-
 # DELETE /api/logout
 @api_view(['DELETE'])
 def logout(request):
@@ -297,6 +285,23 @@ def logout(request):
     return response
 
 
+# GET /api/current_user
+@api_view(['GET'])
+def current_user(request):
+    """
+    API endpoint to fetch a current user
+    """
+    serializer = UserSerializer(
+        request.user,
+        context={"request": request}
+    )
+
+    if request.user.username == "":
+        return Response({"message": "error"}, status=400)
+
+    return Response(serializer.data)
+
+
 # POST /api/survey_results
 @api_view(['POST'])
 def survey_results(request):
@@ -306,9 +311,17 @@ def survey_results(request):
     error_messages = None
     data = loadJson(request.body.decode("utf-8"))
 
+    try:
+        survey = Survey.objects.get(id=data['survey_id'])
+        participant = StudyParticipant.objects.get(user=request.user)
+        survey_token = create_survey_token(participant.token)
+    except ValidationError as e:
+        error_messages = e.message_dict
+        return Response(error_messages, status=400)
+
     survey_result = SurveyResult(
-        token=data['token'],
-        survey_id=data['survey_id'],
+        token=survey_token,
+        survey_id=survey.id,
         computer_use=data['computer_use'],
         hispanic_origin=data['hispanic_origin'] == 'true',
         household_computers=data['household_computers'],
@@ -324,22 +337,12 @@ def survey_results(request):
 
     try:
         survey_result.full_clean()
-        survey = Survey.objects.get(id=data['survey_id'])
-        participant = StudyParticipant.objects.get(user=request.user)
         survey.participants.add(participant)
+        survey_result.save()
     except ValidationError as e:
         error_messages = e.message_dict
         return Response(error_messages, status=400)
 
-    survey_result.save()
     serializer = SurveyResultSerializer(survey_result)
-
-    # TODO : Refactor to use rest framework
-    # serializer = SurveySerializer(data=request.data)
-    # if serializer.is_valid():
-    #   serializer.save()
-    #   return Response(serializer.data, status=status.HTTP_201_CREATED)
-    # else
-    #   return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     return Response(serializer.data, status=status.HTTP_201_CREATED)
