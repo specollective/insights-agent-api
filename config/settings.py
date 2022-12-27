@@ -97,6 +97,9 @@ if len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
                 'PASSWORD': os.environ.get('DB_PASSWORD'),
                 'HOST': os.environ.get('DB_HOST'),
                 'PORT': os.environ.get('DB_PORT'),
+                'TEST': {
+                  'NAME': 'test_db',
+                },
             }
         }
     else:
