@@ -25,14 +25,6 @@ class StudyParticipant(models.Model):
     approved = models.BooleanField(default=False)
     confirmed_phone_number = models.BooleanField(default=False)
     phone_number = PhoneNumberField(blank=False)
-    surveys = models.ManyToManyField('Survey')
-
-    def active_survey(self):
-        surveys = self.surveys.all()
-        if len(surveys) == 0:
-            return None
-
-        return surveys[0]
 
     def __str__(self):
         return self.token
@@ -50,13 +42,12 @@ class Survey(models.Model):
         editable=False,
     )
 
-    participants = models.ManyToManyField('StudyParticipant', blank=True)
+    participants = models.ManyToManyField(StudyParticipant, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
-
 
 
 class SurveyResult(models.Model):

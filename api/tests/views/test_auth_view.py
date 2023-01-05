@@ -164,7 +164,6 @@ class AuthenticationAPITest(TestCase):
         user = User.objects.create(username='Example Name')
         user.studyparticipant.phone_number = '+18888888888'
         user.confirmed_phone_number = True
-        user.studyparticipant.surveys.add(survey)
         user.studyparticipant.save()
         survey = Survey.objects.create(
             slug='example-slug',
