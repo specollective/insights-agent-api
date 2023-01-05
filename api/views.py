@@ -254,7 +254,7 @@ def confirm_access_code(request):
     otp_client = OtpClient()
     if otp_client.verify(access_code):
         # TODO: Handle multiple surveys
-        survey = study_participant.active_survey()
+        survey = Survey.objects.all()[0]
 
         if survey is None:
             return JsonResponse({"message": "not part of an active survey"}, status=400)
