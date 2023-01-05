@@ -248,35 +248,31 @@ def confirm_access_code(request):
     # 2. Find the study particpant by their token
     study_participant = find_study_participant_by_token(data['token'])
     if study_participant is None:
-        return Response({"message": "invalid credentials"}, status=400)
+        return JsonResponse({"message": "invalid credentials"}, status=400)
 
     # 3. Verify one-time passcode
     otp_client = OtpClient()
     if otp_client.verify(access_code):
-        # 5. Create survey token
-        survey_token = create_survey_token(study_participant.token)
-
-        surveys = Survey.objects.filter(
-            participants__id=study_participant.id,
-        )
-
         # TODO: Handle multiple surveys
-        survey = surveys[0]
+        survey = study_participant.active_survey()
 
-        # 6. Build base JSON response object.
+        if survey is None:
+            return JsonResponse({"message": "not part of an active survey"}, status=400)
+
+        # 5. Build base JSON response object.
         response = JsonResponse({
           "message": "success",
           "survey_id": survey.id,
           "table_key": survey.table_key,
         })
 
-        # 7. Set headers for CORS
+        # 6. Set headers for CORS
         response["Access-Control-Allow-Origin"] = "*"
         response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
         response["Access-Control-Max-Age"] = "1000"
         response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
 
-        # 8. Return response object.
+        # 7. Return response object.
         return response
     else:
         return JsonResponse({"message": "invalid access code"}, status=400)
