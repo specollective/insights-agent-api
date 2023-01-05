@@ -12,10 +12,17 @@ class StudyParticipantInline(admin.StackedInline):
 
 
 class StudyParticipantAdmin(admin.ModelAdmin):
+    fields = (
+      "token",
+      "phone_number",
+      "confirmed_phone_number",
+      "approved",
+    )
     list_display = (
       "token",
       "phone_number",
       "confirmed_phone_number",
+      "approved",
     )
 
     def identifier(self, obj):
@@ -23,7 +30,7 @@ class StudyParticipantAdmin(admin.ModelAdmin):
 
 
 class SurveyAdmin(admin.ModelAdmin):
-    fields = ('name','slug', 'participants',)
+    fields = ('name','slug')
 
     list_display = (
       "id",
