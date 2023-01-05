@@ -34,6 +34,9 @@ class StudyParticipant(models.Model):
 
         return surveys[0]
 
+    def __str__(self):
+        return self.token
+
 
 class Survey(models.Model):
     """Represents an individual survey"""
@@ -47,7 +50,7 @@ class Survey(models.Model):
         editable=False,
     )
 
-    participants = models.ManyToManyField(StudyParticipant, blank=True)
+    participants = models.ManyToManyField('StudyParticipant', blank=True)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
 
