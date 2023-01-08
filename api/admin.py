@@ -10,42 +10,80 @@ class StudyParticipantInline(admin.StackedInline):
     model = StudyParticipant
     can_delete = False
 
+class SurveyInline(admin.StackedInline):
+    model = Survey
+    can_delete = False
+
 
 class StudyParticipantAdmin(admin.ModelAdmin):
     fields = (
-      "token",
-      "phone_number",
-      "confirmed_phone_number",
-      "approved",
+        "surveys",
+        "token",
+        "phone_number",
+        "confirmed_phone_number",
+        "approved",
+    )
+    readonly_fields = (
+        "phone_number",
+        "token",
     )
     list_display = (
-      "token",
-      "phone_number",
-      "confirmed_phone_number",
-      "approved",
+        "active_survey",
+        "token",
+        "phone_number",
+        "confirmed_phone_number",
+        "approved",
     )
 
     def identifier(self, obj):
         return obj.token[-10:]
 
+    def active_survey(self, obj):
+        return obj.surveys.first()
+
 
 class SurveyAdmin(admin.ModelAdmin):
-    fields = ('name','slug')
-
+    fields = (
+        "table_key",
+        "created_at",
+        "name",
+        "slug",
+    )
+    readonly_fields = (
+        "table_key",
+        "created_at",
+        "participants",
+    )
     list_display = (
-      "id",
-      "name",
-      "table_key",
-      "created_at",
+        "id",
+        "name",
+        "table_key",
+        "created_at",
     )
 
     def identifier(self, obj):
-        return obj.table_key
+        return obj.name or obj.table_key
 
 
 class SurveyResultAdmin(admin.ModelAdmin):
+    readonly_fields = (
+      "hispanic_origin",
+      "survey",
+      "token",
+      "computer_use",
+      "household_computers",
+      "household_members",
+      "computer_difficulty_level",
+      "solve_computer_problems_level",
+      "handle_computer_problems_level",
+      "computer_acting_up_level",
+      "complex_computer_level",
+      "internet_access",
+      "race",
+    )
     list_display = (
       "identifier",
+      "hispanic_origin",
       "computer_use",
       "household_computers",
       "household_members",
@@ -63,6 +101,16 @@ class SurveyResultAdmin(admin.ModelAdmin):
 
 
 class DataEntryAdmin(admin.ModelAdmin):
+    readonly_fields = (
+      "survey",
+      "token",
+      "identifier",
+      "application_name",
+      "tab_name",
+      "url",
+      "internet_connection",
+      "timestamp",
+    )
     list_display = (
       "identifier",
       "application_name",
