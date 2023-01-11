@@ -16,6 +16,7 @@ class SurveyInline(admin.StackedInline):
 
 
 class StudyParticipantAdmin(admin.ModelAdmin):
+    filter_horizontal = ("surveys",)
     fields = (
         "surveys",
         "token",
@@ -111,6 +112,7 @@ class DataEntryAdmin(admin.ModelAdmin):
       "url",
       "internet_connection",
       "timestamp",
+      "idle_time",
     )
     list_display = (
       "identifier",
