@@ -86,6 +86,7 @@ class DataEntry(models.Model):
     timestamp = models.DateTimeField()
     token = models.CharField(max_length=200, blank=True)
     internet_connection = models.CharField(max_length=200, blank=True)
+    idle_time = models.IntegerField(blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "Data Entries"
