@@ -32,6 +32,7 @@ class DataEntrySerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'url',
             'timestamp',
             'internet_connection',
+            'idle_time',
         ]
         list_serializer_class = BulkListSerializer
 

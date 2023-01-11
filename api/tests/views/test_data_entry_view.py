@@ -33,6 +33,7 @@ class DataEntryAPI(TestCase):
            "url": "",
            "timestamp": "2022-04-25 01:44:57.620506",
            "internet_connection": "online",
+           "idle_time": "2",
         }
         response = client.post(
             '/api/data_entries/',
@@ -43,6 +44,7 @@ class DataEntryAPI(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response_data['application_name'], 'example')
         self.assertEqual(response_data['internet_connection'], 'online')
+        self.assertEqual(response_data['idle_time'], 2)
 
     def test_bulk_data_entry_post_request(self):
         client = Client()
