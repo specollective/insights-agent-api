@@ -43,16 +43,17 @@ class StudyParticipantAdmin(admin.ModelAdmin):
 
 
 class SurveyAdmin(admin.ModelAdmin):
+    filter_horizontal = ("participants",)
     fields = (
         "table_key",
         "created_at",
         "name",
         "slug",
+        "participants",
     )
     readonly_fields = (
         "table_key",
         "created_at",
-        "participants",
     )
     list_display = (
         "id",
