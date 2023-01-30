@@ -188,34 +188,43 @@ def confirm_magic_link(request):
 @csrf_exempt
 def send_access_code(request):
     """
-    API endpoint sends a magic link to the user
+    API endpoint confirms presence of study participant matching phone number or device serial number
+    return token if present
     """
     # 1. Parse request parameters.
     data = loadJson(request.body.decode("utf-8"))
     phone_number = data['phone_number'] if 'phone_number' in data.keys() else None
+    # data = {..., "phone_number": number, ...}
     serial_number = data['serial_number'] if 'serial_number' in data.keys() else None
-
+    # data = {..., "serial_number": number, ...}
     try:
-        # 2. Find study participant by phone number
-        study_participant = StudyParticipant.objects.get(
-          phone_number=phone_number
-        )
+        if phone_number:
+            # 2a. Find study participant by phone number if phone number was in the request
+            study_participant = StudyParticipant.objects.get(
+            phone_number=phone_number
+            )
 
-        # 3. Generate one-time passcode
-        otp_client = OtpClient()
-        otp = otp_client.generate()
+            # 2b. Generate one-time passcode
+            otp_client = OtpClient()
+            otp = otp_client.generate()
 
-        # 4. Sent OTP via SMS
-        sms_client = SmsClient()
-        sms_client.send_sms_access_code(phone_number, otp)
+            # 2c. Sent OTP via SMS
+            sms_client = SmsClient()
+            sms_client.send_sms_access_code(phone_number, otp)
+        
+        if serial_number:
+            # 2.Find study participant by serial number if serial number was in the request  
+            study_participant = StudyParticipant.objects.get(
+            device_serial_number=serial_number
+            )
 
-        # 5. Build base JSON response object
+        # 3. Build base JSON response object
         response = JsonResponse({
             "message": "success",
             "token": str(study_participant.token),
         }, status=200)
 
-        # 6. Set headers for CORS
+        # 4. Set headers for CORS
         response["Access-Control-Allow-Origin"] = "*"
         response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
         response["Access-Control-Max-Age"] = "1000"

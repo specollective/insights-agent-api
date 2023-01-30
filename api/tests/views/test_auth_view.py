@@ -137,6 +137,25 @@ class AuthenticationAPITest(TestCase):
         self.assertEqual(json['token'], str(user.studyparticipant.token))
         mock_send_sms.assert_called_once
 
+    def test_send_token_by_serial_number_success(self):
+        otp_client = OtpClient()
+        client = Client()
+        user = User.objects.create(username='Example Name')
+        user.studyparticipant.device_serial_number = '123_test_abc_test'
+        user.studyparticipant.save()
+        response = client.post(
+            '/api/send_access_code',
+            jsonDump({
+              "serial_number": '123_test_abc_test',
+            }),
+            content_type="application/json",
+        )
+        json = response.json()
+        self.assertEqual(response.headers["Access-Control-Allow-Origin"], "*")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(json['message'], 'success')
+        self.assertEqual(json['token'], str(user.studyparticipant.token))
+
     @mock.patch.object(SmsClient, 'send_sms_access_code')
     def test_send_access_code_post_request_failure(self, mock_send_sms):
         otp_client = OtpClient()
@@ -156,6 +175,21 @@ class AuthenticationAPITest(TestCase):
         self.assertEqual(response.headers["Access-Control-Allow-Origin"], "*")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         mock_send_sms.assert_not_called
+
+    def test_send_token_by_serial_number_request_failure(self):
+        client = Client()
+        user = User.objects.create(username='Example Name')
+        user.studyparticipant.serial_number = 'test_1234_ABC_test'
+        user.studyparticipant.save()
+        response = client.post(
+            '/api/send_access_code',
+            jsonDump({
+              "serial_number": 'BAD_NUMBER',
+            }),
+            content_type="application/json"
+        )
+        self.assertEqual(response.headers["Access-Control-Allow-Origin"], "*")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_confirm_access_code_post_request_success(self):
         otp_client = OtpClient()
