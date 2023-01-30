@@ -192,7 +192,8 @@ def send_access_code(request):
     """
     # 1. Parse request parameters.
     data = loadJson(request.body.decode("utf-8"))
-    phone_number = data['phone_number']
+    phone_number = data['phone_number'] if 'phone_number' in data.keys() else None
+    serial_number = data['serial_number'] if 'serial_number' in data.keys() else None
 
     try:
         # 2. Find study participant by phone number
