@@ -226,8 +226,7 @@ def validate_serial_number(request):
 @csrf_exempt
 def send_access_code(request):
     """
-    API endpoint confirms presence of study participant matching phone number or device serial number
-    return token if present
+    API endpoint confirms presence of study participant by phone number, sends code, returns token
     """
     # 1. Parse request parameters.
     data = loadJson(request.body.decode("utf-8"))
