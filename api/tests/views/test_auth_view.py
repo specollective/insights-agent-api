@@ -144,7 +144,7 @@ class AuthenticationAPITest(TestCase):
         user.studyparticipant.device_serial_number = '123_test_abc_test'
         user.studyparticipant.save()
         response = client.post(
-            '/api/send_access_code',
+            '/api/validate_serial_number',
             jsonDump({
               "serial_number": '123_test_abc_test',
             }),
@@ -182,7 +182,7 @@ class AuthenticationAPITest(TestCase):
         user.studyparticipant.serial_number = 'test_1234_ABC_test'
         user.studyparticipant.save()
         response = client.post(
-            '/api/send_access_code',
+            '/api/validate_serial_number',
             jsonDump({
               "serial_number": 'BAD_NUMBER',
             }),

@@ -183,6 +183,44 @@ def confirm_magic_link(request):
     else:
         return Response({"message": "invalid access code"}, status=400)
 
+@csrf_exempt
+def validate_serial_number(request):
+    """
+    API endpoint validating serial number and returning token 
+    """
+    # 1. Parse request parameters.
+    data = loadJson(request.body.decode("utf-8"))
+    serial_number = data['serial_number']
+
+    try:
+         # 2. Find study participant by serial number
+        study_participant = StudyParticipant.objects.get(
+        device_serial_number=serial_number
+        )
+
+        # 3. Build base JSON response object
+        response = JsonResponse({
+            "message": "success",
+            "token": str(study_participant.token),
+        }, status=200)
+
+        # 4. Set headers for CORS
+        response["Access-Control-Allow-Origin"] = "*"
+        response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        response["Access-Control-Max-Age"] = "1000"
+        response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
+
+        return response
+
+    # except Exception as ex:(To Joe, what is this?)
+    except:
+        response = JsonResponse({ "message": 'invalid credentials' }, status=400)
+        response["Access-Control-Allow-Origin"] = "*"
+        response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        response["Access-Control-Max-Age"] = "1000"
+        response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
+
+        return response
 
 # POST /api/send_access_code
 @csrf_exempt
@@ -193,36 +231,29 @@ def send_access_code(request):
     """
     # 1. Parse request parameters.
     data = loadJson(request.body.decode("utf-8"))
-    phone_number = data['phone_number'] if 'phone_number' in data.keys() else None
-    serial_number = data['serial_number'] if 'serial_number' in data.keys() else None
+    phone_number = data['phone_number']
+
     try:
-        if phone_number:
-            # 2a. Find study participant by phone number if phone number was in the request
-            study_participant = StudyParticipant.objects.get(
-            phone_number=phone_number
-            )
+        # 2. Find study participant by phone number
+        study_participant = StudyParticipant.objects.get(
+          phone_number=phone_number
+        )
 
-            # 2b. Generate one-time passcode
-            otp_client = OtpClient()
-            otp = otp_client.generate()
+        # 3. Generate one-time passcode
+        otp_client = OtpClient()
+        otp = otp_client.generate()
 
-            # 2c. Sent OTP via SMS
-            sms_client = SmsClient()
-            sms_client.send_sms_access_code(phone_number, otp)
+        # 4. Sent OTP via SMS
+        sms_client = SmsClient()
+        sms_client.send_sms_access_code(phone_number, otp)
         
-        if serial_number:
-            # 2.Find study participant by serial number if serial number was in the request  
-            study_participant = StudyParticipant.objects.get(
-            device_serial_number=serial_number
-            )
-
-        # 3. Build base JSON response object
+        # 5. Build base JSON response object
         response = JsonResponse({
             "message": "success",
             "token": str(study_participant.token),
         }, status=200)
 
-        # 4. Set headers for CORS
+        # 6. Set headers for CORS
         response["Access-Control-Allow-Origin"] = "*"
         response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
         response["Access-Control-Max-Age"] = "1000"
