@@ -24,9 +24,9 @@ class StudyParticipant(models.Model):
     full_name = models.CharField(max_length=400)
     approved = models.BooleanField(default=False)
     confirmed_phone_number = models.BooleanField(default=False)
-    phone_number = PhoneNumberField(blank=False)
+    phone_number = PhoneNumberField(blank=True, null=True)
     surveys = models.ManyToManyField('Survey', blank=True)
-    device_serial_number = models.CharField( max_length=100, blank=True)
+    device_serial_number = models.CharField( max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.token

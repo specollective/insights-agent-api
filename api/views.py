@@ -212,7 +212,6 @@ def validate_serial_number(request):
 
         return response
 
-    # except Exception as ex:(To Joe, what is this?)
     except:
         response = JsonResponse({ "message": 'invalid credentials' }, status=400)
         response["Access-Control-Allow-Origin"] = "*"
