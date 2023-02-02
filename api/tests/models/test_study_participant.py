@@ -16,6 +16,7 @@ class StudyParticipantModelTest(TestCase):
         self.assertEqual(study_participant.phone_number, '+18888888888')
 
     ## To do: Uncomment once we add custom validation to study_participant
+    ##          This validation is not business critical
     # def test_study_participant_phone_number_presence_validation(self):
     #     user = User.objects.create(username='example username')
     #     study_participant = user.studyparticipant
