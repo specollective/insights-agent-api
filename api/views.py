@@ -183,12 +183,49 @@ def confirm_magic_link(request):
     else:
         return Response({"message": "invalid access code"}, status=400)
 
+@csrf_exempt
+def validate_serial_number(request):
+    """
+    API endpoint validating serial number and returning token 
+    """
+    # 1. Parse request parameters.
+    data = loadJson(request.body.decode("utf-8"))
+    serial_number = data['serial_number']
+
+    try:
+         # 2. Find study participant by serial number
+        study_participant = StudyParticipant.objects.get(
+        device_serial_number=serial_number
+        )
+
+        # 3. Build base JSON response object
+        response = JsonResponse({
+            "message": "success",
+            "token": str(study_participant.token),
+        }, status=200)
+
+        # 4. Set headers for CORS
+        response["Access-Control-Allow-Origin"] = "*"
+        response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        response["Access-Control-Max-Age"] = "1000"
+        response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
+
+        return response
+
+    except:
+        response = JsonResponse({ "message": 'invalid credentials' }, status=400)
+        response["Access-Control-Allow-Origin"] = "*"
+        response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        response["Access-Control-Max-Age"] = "1000"
+        response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
+
+        return response
 
 # POST /api/send_access_code
 @csrf_exempt
 def send_access_code(request):
     """
-    API endpoint sends a magic link to the user
+    API endpoint confirms presence of study participant by phone number, sends code, returns token
     """
     # 1. Parse request parameters.
     data = loadJson(request.body.decode("utf-8"))
@@ -207,7 +244,7 @@ def send_access_code(request):
         # 4. Sent OTP via SMS
         sms_client = SmsClient()
         sms_client.send_sms_access_code(phone_number, otp)
-
+        
         # 5. Build base JSON response object
         response = JsonResponse({
             "message": "success",

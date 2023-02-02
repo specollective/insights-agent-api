@@ -42,6 +42,7 @@ urlpatterns = [
     path('api/', include(bulk_router.urls)),
     path('api/send_magic_link', views.send_magic_link, name='send_magic_link'),
     path('api/confirm_magic_link', views.confirm_magic_link, name='confirm_magic_link'),
+    path('api/validate_serial_number', views.validate_serial_number, name='validate_serial_number'),
     path('api/send_access_code', views.send_access_code, name='send_access_code'),
     path('api/confirm_access_code', views.confirm_access_code, name='confirm_access_code'),
     path('api/surveys', views.ListSurvey.as_view()),
