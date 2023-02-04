@@ -184,9 +184,9 @@ def confirm_magic_link(request):
         return Response({"message": "invalid access code"}, status=400)
 
 @csrf_exempt
-def validate_serial_number(request):
+def confirm_serial_number(request):
     """
-    API endpoint validating serial number and returning token 
+    API endpoint confirming serial number is in db and returning token, and survey_id, table_key 
     """
     # 1. Parse request parameters.
     data = loadJson(request.body.decode("utf-8"))
@@ -195,13 +195,16 @@ def validate_serial_number(request):
     try:
          # 2. Find study participant by serial number
         study_participant = StudyParticipant.objects.get(
-        device_serial_number=serial_number
+          device_serial_number=serial_number
         )
+        survey = Survey.objects.all()[0]
 
         # 3. Build base JSON response object
         response = JsonResponse({
-            "message": "success",
-            "token": str(study_participant.token),
+          "message": "success",
+          "token": str(study_participant.token),
+          "survey_id": survey.id,
+          "table_key": survey.table_key,
         }, status=200)
 
         # 4. Set headers for CORS
