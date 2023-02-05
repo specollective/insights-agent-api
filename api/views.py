@@ -195,7 +195,7 @@ def confirm_serial_number(request):
     try:
          # 2. Find study participant by serial number
         study_participant = StudyParticipant.objects.get(
-          device_serial_number=serial_number
+            device_serial_number=serial_number
         )
         survey = Survey.objects.all()[0]
 
@@ -390,3 +390,19 @@ def survey_results(request):
     serializer = SurveyResultSerializer(survey_result)
 
     return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+@csrf_exempt
+@api_view(['GET', 'POST'])
+def agent_data_ingestion(request):
+    data = loadJson(request.body.decode("utf-8"))
+
+    data_entries = data['data']
+
+    for data_entry in data_entries:
+        del data_entry['survey_id']
+        del data_entry['table_key']
+
+        new_entry = DataEntry(**data_entry)
+        new_entry.save()
+
+    return JsonResponse({ "message": "success" }, status=200)

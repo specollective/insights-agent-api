@@ -50,5 +50,6 @@ urlpatterns = [
     path('api/survey_results', views.survey_results, name='survey_results'),
     path('api/logout', views.logout, name='logout'),
     path('api/current_user', views.current_user, name='current_user'),
+    path('agent-data-ingestion', views.agent_data_ingestion, name='agent-data-ingestion'),
     path('', include('pages.urls')),
 ]
