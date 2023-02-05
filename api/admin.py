@@ -23,6 +23,7 @@ class StudyParticipantAdmin(admin.ModelAdmin):
         "phone_number",
         "confirmed_phone_number",
         "approved",
+        "device_serial_number",
     )
     readonly_fields = (
         "phone_number",
