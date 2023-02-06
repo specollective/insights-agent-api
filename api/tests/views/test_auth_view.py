@@ -142,8 +142,8 @@ class AuthenticationAPITest(TestCase):
         survey = Survey.objects.create(name='example-name', table_key='example-slug')
         user = User.objects.create(username='Example Name')
         user.studyparticipant.device_serial_number = '123_test_abc_test'
+        user.studyparticipant.surveys.add(survey)
         user.studyparticipant.save()
-        survey.participants.add(user.studyparticipant)
         survey.save()
 
         response = client.post(
@@ -200,12 +200,8 @@ class AuthenticationAPITest(TestCase):
         user = User.objects.create(username='Example Name')
         user.studyparticipant.phone_number = '+18888888888'
         user.confirmed_phone_number = True
+        user.studyparticipant.surveys.add(survey)
         user.studyparticipant.save()
-        survey = Survey.objects.create(
-            slug='example-slug',
-            name='example-name',
-        )
-        survey.participants.add(user.studyparticipant)
         survey.save()
 
         response = client.post(

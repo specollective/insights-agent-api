@@ -197,7 +197,7 @@ def confirm_serial_number(request):
         study_participant = StudyParticipant.objects.get(
           device_serial_number=serial_number
         )
-        survey = Survey.objects.all()[0]
+        survey = study_participant.active_survey()
 
         # 3. Build base JSON response object
         response = JsonResponse({
@@ -293,8 +293,7 @@ def confirm_access_code(request):
     # 3. Verify one-time passcode
     otp_client = OtpClient()
     if otp_client.verify(access_code):
-        # TODO: Handle multiple surveys
-        survey = Survey.objects.all()[0]
+        survey = study_participant.active_survey()
 
         if survey is None:
             return JsonResponse({"message": "not part of an active survey"}, status=400)
