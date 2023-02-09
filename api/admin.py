@@ -29,12 +29,14 @@ class StudyParticipantAdmin(admin.ModelAdmin):
         "phone_number",
         "token",
     )
+
     list_display = (
         "active_survey",
         "token",
         "phone_number",
-        "confirmed_phone_number",
         "approved",
+        "confirmed_phone_number",
+        "device_serial_number",
     )
 
     def identifier(self, obj):
