@@ -29,7 +29,7 @@ class StudyParticipant(models.Model):
     device_serial_number = models.CharField( max_length=100, blank=True, null=True)
 
     def __str__(self):
-        return self.token
+        return str(self.token)
 
     def active_survey(self):
         return self.surveys.first()
