@@ -1,7 +1,6 @@
 import os
-import random
-import string
 import uuid
+import json
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from cryptography.fernet import Fernet
@@ -9,7 +8,11 @@ from cryptography.fernet import Fernet
 from django.contrib.auth import get_user_model
 from api.models import StudyParticipant
 from api.services import OtpClient
+from django.http import JsonResponse
+from rest_framework import status
 
+# NOTE: This file is a grab bag of functions that are used in multiple places. We should
+# refactor this file to be more organized and to have a better name.
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -74,3 +77,27 @@ def check_access_code_response_data(study_participant):
         'access_token': string_token,
         'survey_token': survey_token,
     }
+
+
+def desktop_client_response(data, status_code=status.HTTP_200_OK):
+    """
+    Formats the response from the client to be returned to the user.
+    """
+    response = JsonResponse(data, status=status_code)
+
+    response["Access-Control-Allow-Origin"] = "*"
+    response["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+    response["Access-Control-Max-Age"] = "1000"
+    response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
+
+    return response
+
+
+def parse_request_data(request):
+    """
+    Parse the request body as JSON.
+    """
+    try:
+        return json.loads(request.body.decode('utf-8'))
+    except ValueError:
+        return {}

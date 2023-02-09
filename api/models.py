@@ -52,7 +52,7 @@ class Survey(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.table_key
+        return self.name
 
 
 class SurveyResult(models.Model):
