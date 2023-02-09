@@ -1,8 +1,12 @@
 import os
+import random
+import string
 import uuid
-from cryptography.fernet import Fernet
-from django.contrib.auth import get_user_model
+
 from rest_framework_simplejwt.tokens import RefreshToken
+from cryptography.fernet import Fernet
+
+from django.contrib.auth import get_user_model
 from api.models import StudyParticipant
 from api.services import OtpClient
 
