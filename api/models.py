@@ -3,7 +3,7 @@ import string
 from uuid import uuid4
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -29,7 +29,7 @@ class StudyParticipant(models.Model):
     device_serial_number = models.CharField( max_length=100, blank=True, null=True)
 
     def __str__(self):
-        return self.token
+        return str(self.token)
 
     def active_survey(self):
         return self.surveys.first()
@@ -100,12 +100,16 @@ def set_uniq_table_key(sender, instance, created, **kwargs):
         instance.table_key = f"_{instance.id}_{''.join(random.choices(string.ascii_uppercase + string.digits, k=16))}".lower()
         instance.save()
 
-@receiver(post_save, sender=User)
-def create_study_participant(sender, instance, created, **kwargs):
-    if created:
-        StudyParticipant.objects.create(user=instance)
+
+@receiver(pre_save, sender=StudyParticipant)
+def create_study_participant(sender, instance, *args, **kwargs):
+    try:
+        User.objects.get(username=instance.token)
+    except User.DoesNotExist:
+        user = User.objects.create(
+            username=instance.token,
+            studyparticipant=instance
+        )
+        instance.user = user
 
 
-# @receiver(post_save, sender=User)
-# def save_study_participant(sender, instance, **kwargs):
-#     instance.studyparticipant.save()
