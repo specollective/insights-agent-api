@@ -33,9 +33,8 @@ from api.utils import (
     create_study_participant,
     create_survey_token,
     find_study_participant_by_token,
-    get_tokens_for_user,
-    is_phone_number_taken,
 )
+
 from rest_framework_bulk import (
   BulkListSerializer,
   BulkModelViewSet,

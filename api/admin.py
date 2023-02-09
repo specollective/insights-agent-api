@@ -115,17 +115,21 @@ class DataEntryAdmin(admin.ModelAdmin):
       "timestamp",
       "idle_time",
     )
+
     list_display = (
       "identifier",
       "application_name",
       "tab_name",
       "url",
       "internet_connection",
-      "timestamp",
+      "time",
     )
 
     def identifier(self, obj):
         return obj.token[-10:]
+
+    def time(self, obj):
+        return obj.timestamp.strftime("%Y-%m-%d %H:%M:%S")
 
 
 class UserAdmin(BaseUserAdmin):

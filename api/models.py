@@ -1,13 +1,13 @@
 import random
 import string
-from phonenumber_field.modelfields import PhoneNumberField
 from uuid import uuid4
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from phonenumber_field.modelfields import PhoneNumberField
 
-
+# We need to use the get_user_model to get the custom user model.
 User = get_user_model()
 
 
@@ -95,9 +95,9 @@ class DataEntry(models.Model):
 
 @receiver(post_save, sender=Survey)
 def set_uniq_table_key(sender, instance, created, **kwargs):
-    # The table key must be updated to be an unique alphanumeric key to be used as a postgres table name in the data injestion service.
+    # The table key must be updated to be an unique alphanumeric key to be used as a postgres table name in the data injestion service
     if created:
-        instance.table_key = f"_{instance.id}_{''.join(random.choices(string.ascii_uppercase + string.digits, k=16))}"
+        instance.table_key = f"_{instance.id}_{''.join(random.choices(string.ascii_uppercase + string.digits, k=16))}".lower()
         instance.save()
 
 @receiver(post_save, sender=User)
