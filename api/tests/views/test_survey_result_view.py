@@ -11,7 +11,10 @@ class SurveyResultAPI(TestCase):
 
     def setUp(self):
         self.user = User.objects.create(username='example-user-name')
-        self.study_participant = StudyParticipant.objects.create(user=self.user)
+        self.study_participant = StudyParticipant.objects.create(
+            user=self.user,
+            token=self.user.username,
+        )
         self.survey = Survey.objects.create(
             slug='example-slug',
             name='example-name',

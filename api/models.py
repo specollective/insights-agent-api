@@ -103,7 +103,7 @@ def set_uniq_table_key(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=StudyParticipant)
 def create_user_for_study_participant(sender, instance, created, **kwargs):
-    if created:
+    if created and not instance.user:
         user = User.objects.create(username=instance.token)
         instance.user = user
         instance.save()

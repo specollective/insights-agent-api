@@ -10,6 +10,7 @@ class StudyParticipantInline(admin.StackedInline):
     model = StudyParticipant
     can_delete = False
 
+
 class SurveyInline(admin.StackedInline):
     model = Survey
     can_delete = False
@@ -135,7 +136,7 @@ class DataEntryAdmin(admin.ModelAdmin):
 
 
 class UserAdmin(admin.ModelAdmin):
-    fields = ('username','is_staff','is_active')
+    fields = ('username', 'is_staff', 'is_active')
 
 # inlines = (StudyParticipantInline,)
 
