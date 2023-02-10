@@ -141,7 +141,7 @@ def send_magic_link(request):
     if StudyParticipant.objects.filter(phone_number=phone_number).exists():
         study_participant = StudyParticipant.objects.get(phone_number=phone_number)
         warning_msg = 'It looks like you have already signed up for this study with this phone number. Please follow the instructions given via text message. If you have not received a text message, please email tech4all@buildJUSTLY.org'
-    else: 
+    else:
         study_participant = create_study_participant(full_name, phone_number)
     
     if study_participant is None:
@@ -157,7 +157,7 @@ def send_magic_link(request):
         sms_client.send_sms_magic_link(phone_number, magic_link)
         if warning_msg:
             return Response({"message": "success", "token": token, "error": warning_msg}, status=status.HTTP_200_OK)
-        else: 
+        else:
             return Response({"message": "success", "token": token}, status=status.HTTP_200_OK)
     except Exception as ex:
         return Response({"message": "sms failed to send"}, status=400)

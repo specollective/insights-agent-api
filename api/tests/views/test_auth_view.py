@@ -11,7 +11,47 @@ from api.services import SmsClient, OtpClient
 @mock.patch.dict(os.environ, {"TWILIO_ACCOUNT_SID": "FAKE_TWILIO_ACCOUNT_SID"})
 @mock.patch.dict(os.environ, {"TWILIO_AUTH_TOKEN": "FAKE_TWILIO_AUTH_TOKEN"})
 class AuthenticationAPITest(TestCase):
-    """Test module for sending a magic link via SMS"""
+    """Test serial number flow"""
+    def test_serial_number_post_request_success(self):
+        client = Client()
+        survey = Survey.objects.create(name='example-name', table_key='example-slug')
+        user = User.objects.create(username='Example Name')
+        studyparticipant = StudyParticipant.objects.create(
+            user=user,
+            device_serial_number='123_test_abc_test',
+        )
+        studyparticipant.device_serial_number = '123_test_abc_test'
+        studyparticipant.surveys.add(survey)
+        studyparticipant.save()
+        response = client.post(
+            '/api/confirm_serial_number',
+            jsonDump({
+              "serial_number": '123_test_abc_test',
+            }),
+            content_type="application/json",
+        )
+        json = response.json()
+        self.assertEqual(response.headers["Access-Control-Allow-Origin"], "*")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(json['message'], 'success')
+        self.assertEqual(json['token'], str(studyparticipant.token))
+
+    def test_send_token_by_serial_number_request_failure(self):
+        client = Client()
+        user = User.objects.create(username='Example Name')
+        StudyParticipant.objects.create(
+            user=user,
+            device_serial_number='123_test_abc_test',
+        )
+        response = client.post(
+            '/api/confirm_serial_number',
+            jsonDump({
+              "serial_number": 'BAD_NUMBER',
+            }),
+            content_type="application/json"
+        )
+        self.assertEqual(response.headers["Access-Control-Allow-Origin"], "*")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     @mock.patch.object(SmsClient, 'send_sms_magic_link')
     def test_send_magic_link_post_request_success(self, mock_sms):
@@ -33,6 +73,7 @@ class AuthenticationAPITest(TestCase):
         'send_sms_magic_link',
         side_effect=Exception('Bang!')
     )
+
     def test_send_magic_link_post_request_error(self, mock_send_sms):
         self.assertEqual(StudyParticipant.objects.count(), 0)
         client = Client()
@@ -50,9 +91,10 @@ class AuthenticationAPITest(TestCase):
     @mock.patch.object(SmsClient, 'send_sms_magic_link')
     def test_send_magic_link_existing_num_request_error(self, mock_send_sms):
         user = User.objects.create(username='example username')
-        study_participant = user.studyparticipant
-        study_participant.phone_number = '+18888888888'
-        study_participant.save()
+        study_participant = StudyParticipant.objects.create(
+            user=user,
+            phone_number='+18888888888',
+        )
         self.assertEqual(StudyParticipant.objects.count(), 1)
         client = Client()
         response = client.post(
@@ -69,14 +111,16 @@ class AuthenticationAPITest(TestCase):
         otp_client = OtpClient()
         client = Client()
         user = User.objects.create(username='Example Name')
-        user.studyparticipant.phone_number = '+18888888888'
-        user.confirmed_phone_number = False
-        user.studyparticipant.save()
+        studyparticipant = StudyParticipant.objects.create(
+            user=user,
+            phone_number='+18888888888',
+            confirmed_phone_number=False,
+        )
         response = client.post(
             '/api/confirm_magic_link',
             jsonDump({
               "otp": otp_client.generate(),
-              "token": str(user.studyparticipant.token)
+              "token": str(studyparticipant.token)
             }),
             content_type="application/json"
         )
@@ -88,41 +132,45 @@ class AuthenticationAPITest(TestCase):
         self.assertTrue(json['access_token'] in cookies)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json['message'], 'success')
-        user.studyparticipant.refresh_from_db()
-        self.assertEqual(user.studyparticipant.confirmed_phone_number, True)
+        studyparticipant.refresh_from_db()
+        self.assertEqual(studyparticipant.confirmed_phone_number, True)
 
     def test_confirm_magic_link_post_request_failure(self):
         otp_client = OtpClient()
         client = Client()
         user = User.objects.create(username='Example Name')
-        user.studyparticipant.phone_number = '+18888888888'
-        user.studyparticipant.save()
+        studyparticipant = StudyParticipant.objects.create(
+            user=user,
+            phone_number='+18888888888',
+        )
         response = client.post(
             '/api/confirm_magic_link',
             jsonDump({
               "otp": 'invalid-otp',
-              "token": str(user.studyparticipant.token)
+              "token": str(studyparticipant.token)
             }),
             content_type="application/json"
         )
         json = response.json()
-        user.studyparticipant.refresh_from_db()
+        studyparticipant.refresh_from_db()
         cookies = str(response.cookies)
         self.assertFalse('HttpOnly; Max-Age=1209600' in cookies)
         self.assertFalse('Set-Cookie: access_token=' in cookies)
         self.assertFalse('access_token' in json)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(json['message'], 'invalid access code')
-        self.assertEqual(user.studyparticipant.confirmed_phone_number, False)
+        self.assertEqual(studyparticipant.confirmed_phone_number, False)
 
     @mock.patch.object(SmsClient, 'send_sms_access_code')
     def test_send_access_code_post_request_success(self, mock_send_sms):
         otp_client = OtpClient()
         client = Client()
         user = User.objects.create(username='Example Name')
-        user.studyparticipant.phone_number = '+18888888888'
-        user.confirmed_phone_number = False
-        user.studyparticipant.save()
+        studyparticipant = StudyParticipant.objects.create(
+            user=user,
+            phone_number='+18888888888',
+            confirmed_phone_number=False,
+        )
         response = client.post(
             '/api/send_access_code',
             jsonDump({
@@ -134,38 +182,18 @@ class AuthenticationAPITest(TestCase):
         self.assertEqual(response.headers["Access-Control-Allow-Origin"], "*")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json['message'], 'success')
-        self.assertEqual(json['token'], str(user.studyparticipant.token))
+        self.assertEqual(json['token'], str(studyparticipant.token))
         mock_send_sms.assert_called_once
-
-    def test_serial_number_post_request_success(self):
-        client = Client()
-        survey = Survey.objects.create(name='example-name', table_key='example-slug')
-        user = User.objects.create(username='Example Name')
-        user.studyparticipant.device_serial_number = '123_test_abc_test'
-        user.studyparticipant.surveys.add(survey)
-        user.studyparticipant.save()
-        survey.save()
-
-        response = client.post(
-            '/api/confirm_serial_number',
-            jsonDump({
-              "serial_number": '123_test_abc_test',
-            }),
-            content_type="application/json",
-        )
-        json = response.json()
-        self.assertEqual(response.headers["Access-Control-Allow-Origin"], "*")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(json['message'], 'success')
-        self.assertEqual(json['token'], str(user.studyparticipant.token))        
 
     @mock.patch.object(SmsClient, 'send_sms_access_code')
     def test_send_access_code_post_request_failure(self, mock_send_sms):
         client = Client()
         user = User.objects.create(username='Example Name')
-        user.studyparticipant.phone_number = '+18888888888'
-        user.confirmed_phone_number = False
-        user.studyparticipant.save()
+        studyparticipant = StudyParticipant.objects.create(
+            user=user,
+            phone_number='+18888888888',
+            confirmed_phone_number=False,
+        )
         response = client.post(
             '/api/send_access_code',
             jsonDump({
@@ -178,37 +206,25 @@ class AuthenticationAPITest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         mock_send_sms.assert_not_called
 
-    def test_send_token_by_serial_number_request_failure(self):
-        client = Client()
-        user = User.objects.create(username='Example Name')
-        user.studyparticipant.serial_number = 'test_1234_ABC_test'
-        user.studyparticipant.save()
-        response = client.post(
-            '/api/confirm_serial_number',
-            jsonDump({
-              "serial_number": 'BAD_NUMBER',
-            }),
-            content_type="application/json"
-        )
-        self.assertEqual(response.headers["Access-Control-Allow-Origin"], "*")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
     def test_confirm_access_code_post_request_success(self):
         otp_client = OtpClient()
         client = Client()
         survey = Survey.objects.create(name='example-name', table_key='example-slug')
         user = User.objects.create(username='Example Name')
-        user.studyparticipant.phone_number = '+18888888888'
-        user.confirmed_phone_number = True
-        user.studyparticipant.surveys.add(survey)
-        user.studyparticipant.save()
+        studyparticipant = StudyParticipant.objects.create(
+            user=user,
+            phone_number='+18888888888',
+            confirmed_phone_number=True,
+        )
+        studyparticipant.surveys.add(survey)
+        studyparticipant.save()
         survey.save()
 
         response = client.post(
             '/api/confirm_access_code',
             jsonDump({
               "access_code": otp_client.generate(),
-              "token": str(user.studyparticipant.token),
+              "token": str(studyparticipant.token),
             }),
             content_type="application/json"
         )

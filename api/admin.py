@@ -134,8 +134,10 @@ class DataEntryAdmin(admin.ModelAdmin):
         return obj.timestamp.strftime("%Y-%m-%d %H:%M:%S")
 
 
-class UserAdmin(BaseUserAdmin):
-    inlines = (StudyParticipantInline,)
+class UserAdmin(admin.ModelAdmin):
+    fields = ('username','is_staff','is_active')
+
+# inlines = (StudyParticipantInline,)
 
 
 admin.site.unregister(User)

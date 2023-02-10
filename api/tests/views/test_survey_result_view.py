@@ -3,7 +3,7 @@ from django.test import TestCase, Client
 from json import dumps as jsonDump
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.models import SurveyResult, Survey
+from api.models import SurveyResult, Survey, StudyParticipant
 
 
 class SurveyResultAPI(TestCase):
@@ -11,6 +11,7 @@ class SurveyResultAPI(TestCase):
 
     def setUp(self):
         self.user = User.objects.create(username='example-user-name')
+        self.study_participant = StudyParticipant.objects.create(user=self.user)
         self.survey = Survey.objects.create(
             slug='example-slug',
             name='example-name',
@@ -55,7 +56,7 @@ class SurveyResultAPI(TestCase):
         self.assertEqual(response_data['computer_acting_up_level'], 1)
         self.assertEqual(response_data['complex_computer_level'], 1)
         self.assertEqual(response_data['race'], 'race')
-        
+
     def test_data_survey_post_request_failure(self):
         client = Client()
         example_data = {

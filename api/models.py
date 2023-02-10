@@ -20,7 +20,8 @@ class StudyParticipant(models.Model):
         unique=True,
         default=uuid4
     )
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     full_name = models.CharField(max_length=400)
     approved = models.BooleanField(default=False)
     confirmed_phone_number = models.BooleanField(default=False)
@@ -100,12 +101,9 @@ def set_uniq_table_key(sender, instance, created, **kwargs):
         instance.table_key = f"_{instance.id}_{''.join(random.choices(string.ascii_uppercase + string.digits, k=16))}".lower()
         instance.save()
 
-@receiver(post_save, sender=User)
-def create_study_participant(sender, instance, created, **kwargs):
+@receiver(post_save, sender=StudyParticipant)
+def create_user_for_study_participant(sender, instance, created, **kwargs):
     if created:
-        StudyParticipant.objects.create(user=instance)
-
-
-# @receiver(post_save, sender=User)
-# def save_study_participant(sender, instance, **kwargs):
-#     instance.studyparticipant.save()
+        user = User.objects.create(username=instance.token)
+        instance.user = user
+        instance.save()
