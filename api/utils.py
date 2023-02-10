@@ -16,7 +16,7 @@ from rest_framework import status
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
-    study_participant = user.studyparticipant
+    study_participant = StudyParticipant.objects.get(user=user)
     fernet = Fernet(os.getenv('SECRET_KEY').encode('utf-8'))
     survey_token = fernet.encrypt(study_participant.token.encode('utf-8'))
 
@@ -40,11 +40,14 @@ def create_study_participant(full_name, phone_number):
     user.password = str(uuid.uuid4())
     user.save()
 
-    user.studyparticipant.full_name = full_name
-    user.studyparticipant.phone_number = phone_number
-    user.studyparticipant.save()
+    studyparticipant = StudyParticipant.objects.create(
+        user=user,
+        full_name=full_name,
+        phone_number=phone_number,
+        token=str(uuid.uuid4()),
+    )
 
-    return user.studyparticipant
+    return studyparticipant
 
 
 def find_study_participant_by_token(token):

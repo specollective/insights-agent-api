@@ -3,14 +3,18 @@ from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.models import Survey
+from api.models import Survey, StudyParticipant
 
 
 class SurveyAPI(TestCase):
     """ Test module for Survey API """
     def setUp(self):
         self.user = User.objects.create(username='example-user-name')
-        self.participant = self.user.studyparticipant
+        self.participant = studyparticipant = StudyParticipant.objects.create(
+            user=self.user,
+            phone_number='+18888888888',
+            confirmed_phone_number=False,
+        )
         self.survey = Survey.objects.create()
         Survey.objects.create()
         Survey.objects.create()
